@@ -160,7 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     );
                   },
                   child: const Text(
-                    'Already have an account? Login',
+                    'Already have an account? Login here',
                     style: TextStyle(color: Colors.blue),
                   ),
                 ),
