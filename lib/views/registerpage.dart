@@ -285,7 +285,7 @@ class _RegisterPageState extends State<RegisterPage> {
             var jsonResponse = response.body;
             var resarray = jsonDecode(jsonResponse);
 
-            if (resarray['success'] == 'true') {
+            if (resarray['success']) {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Registration successful')),

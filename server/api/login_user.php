@@ -22,14 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         while($row = $result->fetch_assoc()){
             $userData[] = $row;
         }
-        $response = array("success" => "true", "message" => "Login successful", "data" => $userData);
+        $response = array("success" => true, "message" => "Login successful", "data" => $userData);
     } else {
-        $response = array("success" => "false", "message" => "Invalid email or password");
+        $response = array("success" => false, "message" => "Invalid email or password");
     }
 
     sendJsonResponse($response);
 } else {
-    $response = array("success" => "false", "message" => "Method Not Allowed");
+    $response = array("success" => false, "message" => "Method Not Allowed");
     sendJsonResponse($response);
     exit();
 }

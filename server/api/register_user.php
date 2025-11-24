@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sqlcheckmail = "SELECT * FROM `tbl_users` WHERE `email` = '$email'";
     $result = $conn->query($sqlcheckmail);
     if ($result->num_rows > 0) {
-        $response = array('success' => 'false', 'message' => 'Email already registered');
+        $response = array('success' => false, 'message' => 'Email already registered');
         sendJsonResponse($response);
         exit();
     }
@@ -27,18 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sqlregister = "INSERT INTO `tbl_users`(`name`, `email`, `password`, `phone`) VALUES ('$name','$email','$hashed_password', '$phone')";
     try {
         if ($conn->query($sqlregister) === TRUE) {
-            $response = array('success' => 'true', 'message' => 'Registration successful');
+            $response = array('success' => true, 'message' => 'Registration successful');
             sendJsonResponse($response);
         } else {
-            $response = array('success' => 'false', 'message' => 'Registration failed');
+            $response = array('success' => false, 'message' => 'Registration failed');
             sendJsonResponse($response);
         }
     } catch (Exception $e) {
-        $response = array('success' => 'false', 'message' => $e->getMessage());
+        $response = array('success' => false, 'message' => $e->getMessage());
         sendJsonResponse($response);
     }
 } else {
-    $response = array("success" => "false", "message" => "Method Not Allowed");
+    $response = array("success" => false, "message" => "Method Not Allowed");
     sendJsonResponse($response);
     exit();
 }

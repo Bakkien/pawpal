@@ -279,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
           if (response.statusCode == 200) {
             var jsonResponse = response.body;
             var resarray = jsonDecode(jsonResponse);
-            if (resarray['success'] == 'true') {
+            if (resarray['success']) {
               user = User.fromJson(resarray['data'][0]);
               if (!mounted) return;
               stopLoading();
