@@ -280,6 +280,8 @@ class _LoginPageState extends State<LoginPage> {
             var jsonResponse = response.body;
             var resarray = jsonDecode(jsonResponse);
             if (resarray['success']) {
+              print(isChecked);
+              prefUpdate(isChecked);
               user = User.fromJson(resarray['data'][0]);
               if (!mounted) return;
               stopLoading();

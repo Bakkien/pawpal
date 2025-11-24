@@ -59,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 if (response.statusCode == 200) {
                   var jsonResponse = response.body;
                   var resarray = jsonDecode(jsonResponse);
-                  if (resarray['success'] == 'true') {
+                  if (resarray['success']) {
                     user = User.fromJson(resarray['data'][0]);
                     // Navigate to home page
                     Future.delayed(const Duration(seconds: 2), () {
