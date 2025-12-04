@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:pawpal/views/loginpage.dart';
+import 'package:pawpal/views/submitpetscreen.dart';
 
 class HomePage extends StatefulWidget {
   final User? user;
@@ -22,7 +23,11 @@ class _HomePageState extends State<HomePage> {
       width = width;
     }
     return Scaffold(
-      appBar: AppBar(title: Text('Home Page')),
+      appBar: AppBar(
+        title: Text('Home Page'), 
+        actions: [
+          IconButton(onPressed: logout, icon: Icon(Icons.logout))
+        ]),
       body: Center(
         child: Container(
           width: width,
@@ -37,23 +42,26 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     'Welcome, ${widget.user?.userName}!',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.logout),
-                    iconSize: 35,
-                    onPressed: () {
-                      logout();
-                    },
-                  ),
+                  )
                 ],
               ),
               Expanded(
                 child: Center(
-                  child: Image.asset('assets/images/logo.png', scale:0.6)),
+                  child: Image.asset('assets/images/logo.png', scale: 0.6),
+                ),
               ),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SubmitPetScreen(user: widget.user)),
+          );
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
