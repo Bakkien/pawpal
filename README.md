@@ -1,4 +1,4 @@
-# Pawpal – Pet Adoption and Donation App
+# Pawpal – Pet Adoption and Donation App 📱
 
 
 ---
