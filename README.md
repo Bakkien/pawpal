@@ -107,7 +107,7 @@ url_launcher: ^6.3.2
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-...
+/...
 <activity
   android:name="com.yalantis.ucrop.UCropActivity"
   android:screenOrientation="portrait"
