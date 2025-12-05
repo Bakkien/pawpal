@@ -88,14 +88,28 @@ pawpal/
 
 5. Ensure all plugins are installed and configured based on the platform
 
+**pubspec.yaml**
 ```
 http: ^1.5.0
 shared_preferences: ^2.3.2
 geolocator: ^14.0.2
+geocoding: ^4.0.0
 image_picker: ^1.2.1
 image_cropper: ^11.0.0
 intl: ^0.20.2
 url_launcher: ^6.3.2
+```
+
+**android/src/main/AndroidManifest.xml**
+```
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+<activity
+  android:name="com.yalantis.ucrop.UCropActivity"
+  android:screenOrientation="portrait"
+  android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 ```
 
 ---
@@ -120,16 +134,16 @@ POST /pawpal/server/api/submit_pet.php
 
 ### **Required Fields**
 
-| Field         | Type                | Description                    |
-| ------------- | ------------------- | ------------------------------ |
-| `userid`      | int                 | ID of user                     |
-| `petname`     | string              | Pet name                       |
-| `pettype`     | string              | Pet type (dog, cat, etc.)      |
-| `category`    | string              | Category (adopt, lost, donate) |
-| `description` | string              | Pet description                |
-| `latitude`    | string              | Pet location latitude          |
-| `longitude`   | string              | Pet location longitude         |
-| `images`      | JSON array (base64) | List of base64 image strings   |
+| Field         | Type                | Description                             |
+| ------------- | ------------------- | ----------------------------------------|
+| `userid`      | int                 | ID of user                              |
+| `petname`     | string              | Pet name                                |
+| `pettype`     | string              | Pet type (dog, cat, rabbit, other)      |
+| `category`    | string              | Category (adopt, lost, donate)          |
+| `description` | string              | Pet description                         |
+| `latitude`    | string              | Pet location latitude                   |
+| `longitude`   | string              | Pet location longitude                  |
+| `images`      | JSON array (base64) | List of base64 image strings            |
 
 ---
 

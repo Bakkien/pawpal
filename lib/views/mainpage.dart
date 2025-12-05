@@ -38,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
       width = width;
     }
     return Scaffold(
-      appBar: AppBar(title: Text('Main Screen')),
+      appBar: AppBar(title: Text('Pet Adoption & Donation')),
       body: Center(
         child: Container(
           width: width,
@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 5),
+              SizedBox(height: 10),
 
               // search button
               SizedBox(

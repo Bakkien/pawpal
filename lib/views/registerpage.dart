@@ -42,7 +42,8 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(title: Text('Register')),
       body: Center(
         child: SingleChildScrollView(
-          child: Padding(
+          child: Container(
+            width: width,
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

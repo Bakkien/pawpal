@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,22 +23,16 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   late double width;
   TextEditingController petNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  TextEditingController latController = TextEditingController();
-  TextEditingController lngController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
   List<String> petTypes = ["Cat", "Dog", "Rabbit", "Other"];
   List<String> categories = ["Adoption", "Donation Request", "Help/Rescue"];
   String selectedPetType = "Other", selectedCategory = "Adoption";
   late Position position;
+  late double lat, lng;
   List<Uint8List?> webImages = [null, null, null];
   List<File?> images = [null, null, null];
-  String? petNameError, descriptionError, latError, lngError, imageError;
+  String? petNameError, descriptionError, locationError, imageError;
   bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _autoGetCurrentLocation();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,36 +156,37 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
-                // location (latitiude) (longitude)
+                // location
                 Row(
                   children: [
                     Text('Location', style: TextStyle(fontSize: 16)),
-                    SizedBox(width: 25),
+                    SizedBox(width: 26),
                     Expanded(
                       child: TextField(
-                        controller: latController,
+                        maxLines: 3,
+                        controller: locationController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: 'Latitude',
-                          hintText: 'Latitude',
-                          errorText: latError,
+                          errorText: locationError,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    Expanded(
-                      child: TextField(
-                        controller: lngController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Longitude',
-                          hintText: 'Longitude',
-                          errorText: lngError,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
+                          suffixIcon: IconButton(
+                            onPressed: () async {
+                              position = await _determinePosition();
+                              lat = position.latitude;
+                              lng = position.longitude;
+                              List<Placemark> placemarks =
+                                  await placemarkFromCoordinates(
+                                    position.latitude,
+                                    position.longitude,
+                                  );
+                              Placemark place = placemarks[0];
+                              locationController.text =
+                                  "${place.name},\n${place.postalCode},${place.locality},\n${place.administrativeArea},${place.country}";
+                              setState(() {});
+                            },
+                            icon: Icon(Icons.location_searching),
                           ),
                         ),
                       ),
@@ -237,7 +233,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                   )
                                 : null,
                           ),
-                          child: (images[0] == null)
+                          child: (images[0] == null && webImages[0] == null)
                               ? Center(
                                   child: Icon(
                                     Icons.photo_library,
@@ -256,7 +252,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                           setState(() {
                             imageError = null;
                           });
-                          if (images[0] != null) {
+                          if (images[0] != null || webImages[0] != null) {
                             if (kIsWeb) {
                               openGallery(1);
                             } else {
@@ -288,7 +284,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                   )
                                 : null, // return icon if no image
                           ),
-                          child: (images[1] == null)
+                          child: (images[1] == null && webImages[1] == null)
                               ? Center(
                                   child: Icon(
                                     Icons.photo_library,
@@ -307,10 +303,11 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                           setState(() {
                             imageError = null;
                           });
-                          if (images[0] == null) {
+                          if (images[0] == null || webImages[0] == null) {
                             imageError = 'Please click on the first one';
                             setState(() {});
-                          } else if (images[1] == null) {
+                          } else if (images[1] == null ||
+                              webImages[1] == null) {
                             imageError = 'Please click on the second one';
                             setState(() {});
                           } else {
@@ -342,7 +339,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                   )
                                 : null,
                           ),
-                          child: (images[2] == null)
+                          child: (images[2] == null && webImages[2] == null)
                               ? Center(
                                   child: Icon(
                                     Icons.photo_library,
@@ -383,12 +380,16 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   }
 
   // auto obtain the current location of the user
-  Future<void> _autoGetCurrentLocation() async {
+  Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
+    // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
@@ -396,21 +397,25 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
       return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.',
       );
     }
 
-    position = await Geolocator.getCurrentPosition();
-    setState(() {
-      latController.text = position.latitude.toString();
-      lngController.text = position.longitude.toString();
-    });
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
   }
 
   // choose the image source
@@ -511,16 +516,14 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     String petType = selectedPetType;
     String category = selectedCategory;
     String description = descriptionController.text.trim();
-    double lat = double.tryParse(latController.text.trim()) ?? 0.0;
-    double lng = double.tryParse(lngController.text.trim()) ?? 0.0;
+    String location = locationController.text.trim();
 
     List<String> base64images = [];
 
     setState(() {
       petNameError = null;
       descriptionError = null;
-      latError = null;
-      lngError = null;
+      locationError = null;
       imageError = null;
     });
 
@@ -542,27 +545,9 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       });
       return;
     }
-    if (latController.text.trim().isEmpty) {
+    if (location.isEmpty) {
       setState(() {
-        latError = "Required field";
-      });
-      return;
-    }
-    if (lat == 0.0) {
-      setState(() {
-        latError = "Invalid location";
-      });
-      return;
-    }
-    if (lngController.text.trim().isEmpty) {
-      setState(() {
-        lngError = "Required field";
-      });
-      return;
-    }
-    if (lng == 0.0) {
-      setState(() {
-        lngError = "Invalid location";
+        locationError = "Required field";
       });
       return;
     }
