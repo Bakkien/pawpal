@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:pawpal/models/pet.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:pawpal/myconfig.dart';
-import 'package:pawpal/views/loginpage.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
