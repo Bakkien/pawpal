@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:pawpal/views/loginpage.dart';
+import 'package:pawpal/views/mainscreen.dart';
 import 'package:pawpal/views/submitpetscreen.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,10 +25,9 @@ class _HomePageState extends State<HomePage> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'), 
-        actions: [
-          IconButton(onPressed: logout, icon: Icon(Icons.logout))
-        ]),
+        title: Text('Home Page'),
+        actions: [IconButton(onPressed: logout, icon: Icon(Icons.logout))],
+      ),
       body: Center(
         child: Container(
           width: width,
@@ -36,18 +36,30 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Welcome, ${widget.user?.userName}!',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  )
-                ],
+              Text(
+                'Welcome, ${widget.user?.userName}!',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
+
               Expanded(
                 child: Center(
-                  child: Image.asset('assets/images/logo.png', scale: 0.6),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainScreen(user: widget.user),
+                            ),
+                          );
+                        },
+                        child: Image.asset('assets/images/logo.png', scale: 0.6),
+                      ),
+                      Text('Click on Me', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -58,7 +70,9 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SubmitPetScreen(user: widget.user)),
+            MaterialPageRoute(
+              builder: (context) => SubmitPetScreen(user: widget.user),
+            ),
           );
         },
         child: Icon(Icons.add),

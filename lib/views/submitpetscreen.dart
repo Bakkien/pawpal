@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:geolocator/geolocator.dart';
@@ -27,7 +28,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   List<String> categories = ["Adoption", "Donation Request", "Help/Rescue"];
   String selectedPetType = "Other", selectedCategory = "Adoption";
   late Position position;
-  File? image1, image2, image3;
+  List<Uint8List?> webImages = [null, null, null];
+  List<File?> images = [null, null, null];
   String? petNameError, descriptionError, latError, lngError, imageError;
   bool isLoading = false;
 
@@ -162,6 +164,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     Expanded(
                       child: TextField(
                         controller: latController,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           labelText: 'Latitude',
                           hintText: 'Latitude',
@@ -176,6 +179,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     Expanded(
                       child: TextField(
                         controller: lngController,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           labelText: 'Longitude',
                           hintText: 'Longitude',
@@ -196,7 +200,15 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          pickimagedialog(1); // index for image, easy for pick and crop image based on index
+                          setState(() {
+                            imageError = null;
+                          });
+                          // index for image, easy for pick and crop image based on index
+                          if (kIsWeb) {
+                            openGallery(0);
+                          } else {
+                            pickimagedialog(0);
+                          }
                         },
                         child: Container(
                           height: 95,
@@ -207,14 +219,19 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                   : Colors.red,
                             ),
                             borderRadius: BorderRadius.circular(20),
-                            image: (image1 != null)
+                            image: (images[0] != null && !kIsWeb)
                                 ? DecorationImage(
-                                    image: FileImage(image1!),
+                                    image: FileImage(images[0]!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : (webImages[0] != null)
+                                ? DecorationImage(
+                                    image: MemoryImage(webImages[0]!),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          child: (image1 == null)
+                          child: (images[0] == null)
                               ? Center(
                                   child: Icon(
                                     Icons.photo_library,
@@ -230,8 +247,15 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          if (image1 != null) {
-                            pickimagedialog(2);
+                          setState(() {
+                            imageError = null;
+                          });
+                          if (images[0] != null) {
+                            if (kIsWeb) {
+                              openGallery(1);
+                            } else {
+                              pickimagedialog(1);
+                            }
                           } else {
                             imageError = 'Please click on the first one';
                             setState(() {});
@@ -246,14 +270,19 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                   : Colors.red,
                             ),
                             borderRadius: BorderRadius.circular(20),
-                            image: (image2 != null)
+                            image: (images[1] != null && !kIsWeb)
                                 ? DecorationImage(
-                                    image: FileImage(image2!),
+                                    image: FileImage(images[1]!),
                                     fit: BoxFit.cover,
                                   )
-                                : null,
+                                : (webImages[1] != null)
+                                ? DecorationImage(
+                                    image: MemoryImage(webImages[1]!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null, // return icon if no image
                           ),
-                          child: (image2 == null)
+                          child: (images[1] == null)
                               ? Center(
                                   child: Icon(
                                     Icons.photo_library,
@@ -269,14 +298,21 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          if (image1 == null) {
+                          setState(() {
+                            imageError = null;
+                          });
+                          if (images[0] == null) {
                             imageError = 'Please click on the first one';
                             setState(() {});
-                          } else if (image2 == null) {
+                          } else if (images[1] == null) {
                             imageError = 'Please click on the second one';
                             setState(() {});
                           } else {
-                            pickimagedialog(3);
+                            if (kIsWeb) {
+                              openGallery(2);
+                            } else {
+                              pickimagedialog(2);
+                            }
                           }
                         },
                         child: Container(
@@ -288,14 +324,19 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                   : Colors.red,
                             ),
                             borderRadius: BorderRadius.circular(20),
-                            image: (image3 != null)
+                            image: (images[2] != null && !kIsWeb)
                                 ? DecorationImage(
-                                    image: FileImage(image3!),
+                                    image: FileImage(images[2]!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : (webImages[2] != null)
+                                ? DecorationImage(
+                                    image: MemoryImage(webImages[2]!),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          child: (image3 == null)
+                          child: (images[2] == null)
                               ? Center(
                                   child: Icon(
                                     Icons.photo_library,
@@ -365,7 +406,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     });
   }
 
-    void pickimagedialog(int index) {
+  void pickimagedialog(int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -396,14 +437,19 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       },
     );
   }
-  
+
   Future<void> openCamera(int index) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
+      if (kIsWeb) {
+        webImages[index] = await pickedFile.readAsBytes();
+        setState(() {});
+      } else {
         File imageFile = File(pickedFile.path);
         cropImage(index, imageFile);
+      }
     }
   }
 
@@ -412,12 +458,18 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      cropImage(index, imageFile);
+      if (kIsWeb) {
+        webImages[index] = await pickedFile.readAsBytes();
+        setState(() {});
+      } else {
+        File imageFile = File(pickedFile.path);
+        cropImage(index, imageFile); // only for mobile
+      }
     }
   }
 
   Future<void> cropImage(int index, File image) async {
+     if (kIsWeb) return; // skip cropping on web
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: image.path,
       aspectRatio: CropAspectRatio(ratioX: 3, ratioY: 3),
@@ -433,9 +485,9 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
 
     if (croppedFile != null) {
       image = File(croppedFile.path);
-      if (index == 1) image1 = image;
-      if (index == 2) image2 = image;
-      if (index == 3) image3 = image;
+      if (index == 0) images[0] = image;
+      if (index == 1) images[1] = image;
+      if (index == 2) images[2] = image;
       imageError = null;
       setState(() {});
     }
@@ -446,8 +498,9 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     String petType = selectedPetType;
     String category = selectedCategory;
     String description = descriptionController.text.trim();
-    String lat = latController.text.trim();
-    String lng = lngController.text.trim();
+    double lat = double.tryParse(latController.text.trim()) ?? 0.0;
+    double lng = double.tryParse(lngController.text.trim()) ?? 0.0;
+
     List<String> base64images = [];
 
     setState(() {
@@ -476,48 +529,76 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       });
       return;
     }
-    if (lat.isEmpty) {
+    if (latController.text.trim().isEmpty) {
       setState(() {
         latError = "Required field";
       });
       return;
     }
-    if (lng.isEmpty) {
+    if(lat == 0.0){
+      setState(() {
+        latError = "Invalid location";
+      });
+      return;
+    }
+    if (lngController.text.trim().isEmpty) {
       setState(() {
         lngError = "Required field";
       });
       return;
     }
-    if (image1 == null) {
+    if(lng == 0.0){
+      setState(() {
+        lngError = "Invalid location";
+      });
+      return;
+    }
+    if(kIsWeb){
+      for(int i = 0; i < 3 && webImages[i] != null; i++){
+        base64images.add(base64Encode(webImages[i]!));
+      }
+    }else{
+      if (images[0] == null) {
       setState(() {
         imageError = "Please select at least one image";
       });
       return;
-    } else {
-      base64images.add(base64Encode(image1!.readAsBytesSync()));
-    }
-    if (image2 != null) {
-      base64images.add(base64Encode(image2!.readAsBytesSync()));
-    }
-    if (image3 != null) {
-      base64images.add(base64Encode(image3!.readAsBytesSync()));
+      }
+      for(int i = 0; i < 3 && images[i] != null; i++){
+        base64images.add(base64Encode(images[i]!.readAsBytesSync()));
+      }
     }
 
     // show submit confirmation dialog
     showDialog(
       context: context,
-      builder: (context){
+      builder: (context) {
         return AlertDialog(
           content: const Text('Are you sure you want to submit?'),
           actions: [
-            TextButton(onPressed: () {
-              submitPet(petName, petType, category, description, lat, lng, base64images);
-              } , 
-              child: Text('Submit')),
-              TextButton(onPressed:  () => Navigator.pop(context), child: const Text('Cancel'))
+            TextButton(
+              onPressed: () {
+                submitPet(
+                  petName,
+                  petType,
+                  category,
+                  description,
+                  lat.toString(),
+                  lng.toString(),
+                  base64images,
+                );
+              },
+              child: Text('Submit'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
           ],
         );
-      }
+      },
     );
   }
 
@@ -528,26 +609,27 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     String description,
     String lat,
     String lng,
-    List<String> base64images,
+    List<String?> base64images,
   ) {
     setState(() {
-        isLoading = true;
-      });
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Row(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 20),
-                Text('Loading...'),
-              ],
-            ),
-          );
-        },
-        barrierDismissible: false,
-      );
+      isLoading = true;
+    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Loading...'),
+            ],
+          ),
+        );
+      },
+      barrierDismissible: false,
+    );
+
     http
         .post(
           Uri.parse('${MyConfig.server}/pawpal/server/api/submit_pet.php'),
@@ -559,7 +641,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             'description': description,
             'latitude': lat,
             'longitude': lng,
-            'image': jsonEncode(base64images),
+            'images': jsonEncode(base64images),
           },
         )
         .then((response) {
@@ -571,7 +653,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
               stopLoading();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Service submitted successfully"),
+                  content: Text("Submit failed: ${resarray['message']}"),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -594,7 +676,17 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
               );
             }
           }
-        });
+        }).timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            if (!mounted) return;
+            stopLoading();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Request timed out. Please try again.'),
+              ),
+            );
+          },);
   }
 
   void stopLoading() {
