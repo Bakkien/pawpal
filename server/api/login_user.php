@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     include 'dbconnect.php';
 
+    // login query
     $sqllogin = "SELECT * FROM `tbl_users` WHERE `email` = '$email' AND `password` = '$hashed_password'";
     $result = $conn->query($sqllogin);
 

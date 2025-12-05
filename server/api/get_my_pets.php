@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     JOIN tbl_users u ON p.user_id = u.user_id
     ";
 
-    // Specific search
+    // Specific content search
     if (isset($_GET['search']) && !empty($_GET['search'])) {
         $search = $conn->real_escape_string($_GET['search']);
         $sqlsearch = $baseQuery . "

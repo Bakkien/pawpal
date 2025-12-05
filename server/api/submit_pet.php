@@ -45,11 +45,11 @@ try {
 			$response = array('success' => true, 'message' => 'Pet submitted successfully');
 			sendJsonResponse($response);
 		} else {
-			$response = array('success' => false, 'message' => 'Pet failed to submit');
+			$response = array('success' => false, 'message' => 'Pet not added');
 			sendJsonResponse($response);
 		}
 	} else {
-		$response = array('success' => false, 'message' => 'Pet not added');
+		$response = array('success' => false, 'message' => 'Pet failed to submit');
 		sendJsonResponse($response);
 	}
 } catch (Exception $e) {

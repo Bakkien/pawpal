@@ -32,6 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // logo and loading animation
             Image.asset('assets/images/logo.png', scale: 0.6),
             const SizedBox(height: 20),
             CircularProgressIndicator(),
@@ -41,6 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  // auto login to the page
   void autoLogin() {
     SharedPreferences.getInstance().then((prefs) {
       bool? rememberMe = prefs.getBool('rememberMe');
@@ -91,20 +93,20 @@ class _SplashScreenState extends State<SplashScreen> {
         } else {
           navigateToLogin();
         }
-      }
-      else {
+      } else {
         navigateToLogin();
       }
     });
   }
 
+  // navigate to login page
   void navigateToLogin() {
     Future.delayed(const Duration(seconds: 2), () {
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-      });
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    });
   }
 }

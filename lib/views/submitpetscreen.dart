@@ -57,8 +57,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             margin: EdgeInsets.all(10),
             child: Column(
               children: [
+                // logo
                 Image.asset('assets/images/pet_background.png', scale: 3),
                 SizedBox(height: 20),
+                // pet name
                 Row(
                   children: [
                     Text('Pet Name', style: TextStyle(fontSize: 16)),
@@ -77,6 +79,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+                // pet type
                 Row(
                   children: [
                     Text('Pet Type', style: TextStyle(fontSize: 16)),
@@ -106,8 +109,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     ),
                   ],
                 ),
-
                 SizedBox(height: 10),
+                // category
                 Row(
                   children: [
                     Text('Category', style: TextStyle(fontSize: 16)),
@@ -138,6 +141,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+                // description
                 Row(
                   children: [
                     Text('Description', style: TextStyle(fontSize: 16)),
@@ -157,6 +161,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+                // location (latitiude) (longitude)
                 Row(
                   children: [
                     Text('Location', style: TextStyle(fontSize: 16)),
@@ -193,6 +198,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+                // image upload maximum up to 3
                 Row(
                   children: [
                     Text('Image\n(Max 3)', style: TextStyle(fontSize: 16)),
@@ -363,7 +369,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      fieldValidation();
+                      submitValidation();
                     },
                     child: Text('Submit'),
                   ),
@@ -376,6 +382,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     );
   }
 
+  // auto obtain the current location of the user
   Future<void> _autoGetCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -406,6 +413,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     });
   }
 
+  // choose the image source
   void pickimagedialog(int index) {
     showDialog(
       context: context,
@@ -438,6 +446,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     );
   }
 
+  // open the camera to capture image
   Future<void> openCamera(int index) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
@@ -453,6 +462,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     }
   }
 
+  // open gallery to select image
   Future<void> openGallery(int index) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -468,8 +478,9 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     }
   }
 
+  // crop the image
   Future<void> cropImage(int index, File image) async {
-     if (kIsWeb) return; // skip cropping on web
+    if (kIsWeb) return; // skip cropping on web
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: image.path,
       aspectRatio: CropAspectRatio(ratioX: 3, ratioY: 3),
@@ -485,6 +496,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
 
     if (croppedFile != null) {
       image = File(croppedFile.path);
+      // save image in list
       if (index == 0) images[0] = image;
       if (index == 1) images[1] = image;
       if (index == 2) images[2] = image;
@@ -493,7 +505,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     }
   }
 
-  void fieldValidation() {
+  // validate all fields for submission
+  void submitValidation() {
     String petName = petNameController.text.trim();
     String petType = selectedPetType;
     String category = selectedCategory;
@@ -535,7 +548,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       });
       return;
     }
-    if(lat == 0.0){
+    if (lat == 0.0) {
       setState(() {
         latError = "Invalid location";
       });
@@ -547,24 +560,24 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       });
       return;
     }
-    if(lng == 0.0){
+    if (lng == 0.0) {
       setState(() {
         lngError = "Invalid location";
       });
       return;
     }
-    if(kIsWeb){
-      for(int i = 0; i < 3 && webImages[i] != null; i++){
+    if (kIsWeb) {
+      for (int i = 0; i < 3 && webImages[i] != null; i++) {
         base64images.add(base64Encode(webImages[i]!));
       }
-    }else{
+    } else {
       if (images[0] == null) {
-      setState(() {
-        imageError = "Please select at least one image";
-      });
-      return;
+        setState(() {
+          imageError = "Please select at least one image";
+        });
+        return;
       }
-      for(int i = 0; i < 3 && images[i] != null; i++){
+      for (int i = 0; i < 3 && images[i] != null; i++) {
         base64images.add(base64Encode(images[i]!.readAsBytesSync()));
       }
     }
@@ -602,6 +615,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     );
   }
 
+  // send pet data to database
   void submitPet(
     String petName,
     String petType,
@@ -676,7 +690,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
               );
             }
           }
-        }).timeout(
+        })
+        .timeout(
           const Duration(seconds: 10),
           onTimeout: () {
             if (!mounted) return;
@@ -686,9 +701,11 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                 content: Text('Request timed out. Please try again.'),
               ),
             );
-          },);
+          },
+        );
   }
 
+  // close the status of loading on screen
   void stopLoading() {
     if (isLoading) {
       Navigator.pop(context); // Close the loading dialog

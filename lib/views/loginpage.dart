@@ -49,8 +49,11 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // logo
                 Image.asset('assets/images/logo_nodesc.png', scale: 0.8),
                 const SizedBox(height: 20),
+
+                // email text field
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -64,6 +67,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // password text field
                 TextField(
                   controller: passwordController,
                   obscureText: visible,
@@ -90,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 5),
+                // check box for remember me
                 Row(
                   children: [
                     Checkbox(
@@ -139,6 +145,8 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 10),
+
+                // login button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -149,6 +157,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // tap to register page
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -164,15 +174,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // tap to nothing
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
-                      ),
-                    );
-                  },
+                  onTap: () {},
                   child: const Text(
                     'Forgot Password?',
                     style: TextStyle(color: Colors.grey),
@@ -186,6 +191,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // auto load preferences
   void loadPreferences() {
     SharedPreferences.getInstance().then((prefs) {
       bool? rememberMe = prefs.getBool('rememberMe');
@@ -200,6 +206,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  // update preferences
   void prefUpdate(bool isChecked) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (isChecked) {
@@ -213,6 +220,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // validate all fields for login
   void loginValidation() {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
@@ -250,6 +258,7 @@ class _LoginPageState extends State<LoginPage> {
     loginUser(email, password);
   }
 
+  // user login to home page
   void loginUser(String email, String password) async {
     setState(() {
       isLoading = true;
@@ -323,6 +332,7 @@ class _LoginPageState extends State<LoginPage> {
         );
   }
 
+  // close the status of loading on screen
   void stopLoading() {
     if (isLoading) {
       Navigator.pop(context); // Close the loading dialog

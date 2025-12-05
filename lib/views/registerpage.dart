@@ -47,8 +47,11 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // logo
                 Image.asset('assets/images/logo_nodesc.png', scale: 0.8),
                 const SizedBox(height: 20),
+
+                // name text field
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
@@ -61,6 +64,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // email text field
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -74,6 +79,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // password textfield
                 TextField(
                   controller: passwordController,
                   obscureText: visible,
@@ -100,6 +107,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // confirm password text field
                 TextField(
                   controller: confirmPasswordController,
                   obscureText: visible,
@@ -126,6 +135,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // phone text field
                 TextField(
                   controller: phoneController,
                   decoration: InputDecoration(
@@ -139,6 +150,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // register button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -149,6 +162,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // tap to login page
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
@@ -172,6 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  // validate all fields for register
   void registerValidation() {
     String name = nameController.text;
     String email = emailController.text;
@@ -245,6 +261,7 @@ class _RegisterPageState extends State<RegisterPage> {
     registerUser(name, email, password, phone);
   }
 
+  // register the user
   void registerUser(
     String name,
     String email,
@@ -329,6 +346,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
   }
 
+  // close the status of loading on screen
   void stopLoading() {
     if (isLoading) {
       Navigator.pop(context); // Close the loading dialog

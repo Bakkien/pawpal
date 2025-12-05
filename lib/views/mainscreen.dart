@@ -33,7 +33,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
-
     if (width > 600) {
       width = 600;
     } else {
@@ -49,6 +48,7 @@ class _MainScreenState extends State<MainScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              // search textfield
               TextField(
                 controller: searchController,
                 decoration: InputDecoration(
@@ -60,6 +60,8 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
               SizedBox(height: 5),
+
+              // search button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -77,6 +79,7 @@ class _MainScreenState extends State<MainScreen> {
               SizedBox(height: 20),
               Expanded(
                 child: listPets.isEmpty
+                    // show no submission if empty list
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -99,6 +102,7 @@ class _MainScreenState extends State<MainScreen> {
                           ],
                         ),
                       )
+                    // show the list of pets
                     : ListView.builder(
                         itemCount: listPets.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -182,7 +186,8 @@ class _MainScreenState extends State<MainScreen> {
                                         SizedBox(height: 4),
                                         // Description
                                         Text(
-                                          listPets[index].description.toString(),
+                                          listPets[index].description
+                                              .toString(),
                                           style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.black87,
@@ -217,13 +222,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void logout() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
-  }
-
+  // load all pets
   void loadPets(String searchQuery) {
     listPets.clear();
     setState(() {
@@ -268,6 +267,7 @@ class _MainScreenState extends State<MainScreen> {
         });
   }
 
+  // show all details in dialog using table
   void showDetailsDialog(int index) {
     String formattedDate = formatter.format(
       DateTime.parse(listPets[index].createdDate.toString()),
@@ -309,29 +309,7 @@ class _MainScreenState extends State<MainScreen> {
                       1: FlexColumnWidth(),
                     },
                     children: [
-                      TableRow(
-                        children: [
-                          TableCell(
-                            // Use TableCell to apply consistent styling/padding
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Pet Name'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                listPets[index].petName.toString(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      // table row for pet type
                       TableRow(
                         children: [
                           TableCell(
@@ -347,13 +325,12 @@ class _MainScreenState extends State<MainScreen> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                listPets[index].petType.toString(),
-                              ),
+                              child: Text(listPets[index].petType.toString()),
                             ),
                           ),
                         ],
                       ),
+                      // table row for category
                       TableRow(
                         children: [
                           TableCell(
@@ -369,13 +346,12 @@ class _MainScreenState extends State<MainScreen> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                listPets[index].category.toString(),
-                              ),
+                              child: Text(listPets[index].category.toString()),
                             ),
                           ),
                         ],
                       ),
+                      // table row for description
                       TableRow(
                         children: [
                           TableCell(
@@ -398,6 +374,7 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ],
                       ),
+                      // table for location with latitude and longitude
                       TableRow(
                         children: [
                           TableCell(
@@ -420,6 +397,7 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ],
                       ),
+                      // table for date
                       TableRow(
                         children: [
                           TableCell(
@@ -440,6 +418,7 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ],
                       ),
+                      // tale for post by whom
                       TableRow(
                         children: [
                           TableCell(
@@ -455,13 +434,12 @@ class _MainScreenState extends State<MainScreen> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                listPets[index].userName.toString(),
-                              ),
+                              child: Text(listPets[index].userName.toString()),
                             ),
                           ),
                         ],
                       ),
+                      // table for poster's phone
                       TableRow(
                         children: [
                           TableCell(
@@ -477,9 +455,7 @@ class _MainScreenState extends State<MainScreen> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                listPets[index].userPhone.toString(),
-                              ),
+                              child: Text(listPets[index].userPhone.toString()),
                             ),
                           ),
                         ],
@@ -487,6 +463,7 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   ),
                   SizedBox(height: 5),
+                  // the way of contact to poster
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
