@@ -38,7 +38,9 @@
 
 2. Import the database:
 
-   * Open *phpMyAdmin*
+   * Open **XAMMP**
+   * Start *Apache* and *MySQL*
+   * Click *Admin* at *MySQL* side to open *phpMyAdmin*
    * Create a database: **pawpal_db**
    * Import the SQL file in server->pawpal_db.sql
 
