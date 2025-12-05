@@ -125,7 +125,7 @@ url_launcher: ^6.3.2
 
 ---
 
-# 🐶 Submit Pet API
+# 😺 Submit Pet API
 
 ### **URL**
 
@@ -206,7 +206,7 @@ http.post(
 
 ---
 
-# 🧩 Notes
+# 📝 Notes
 
 * All uploaded images are stored inside:
 
