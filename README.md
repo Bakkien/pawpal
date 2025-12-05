@@ -1,61 +1,202 @@
-# PawPal
+# Pawpal– Pet Adoption and Donation App
 
-PawPal is a Pet Adoption and Donation App created using Flutter + PHP + XAMPP. Currently, the application's functionality is limited to login and registration.
 
-Input
+---
 
-• Name
+# 🐾 PawPal
 
-• Email
+**PawPal** is  created using **Flutter Code** as frontend,  **PHP (XAMPP)** as backend, and connects to **MySQL** to manage users, pets, and images.
 
-• Password
+---
 
-• Confirm Password
+## 📌 Table of Contents
 
-• Phone
+1. [Project Setup](#project-setup)
+2. [Folder Structure](#folder-structure)
+3. [API Endpoints](#api-endpoints)
+4. [Submit Pet API](#submit-pet-api)
+5. [Sample JSON Request](#sample-json-request)
+6. [Response Format](#response-format)
 
-Process
+---
 
-• Search email for duplicates
+## 🚀 Project Setup
 
-• Register an account and send it to the database
+### **1. Requirements**
 
-• Log in with the registered account
+* XAMPP 
+* MySQL 
+* Flutter  
 
-• Saved preferences if needed
+### **2. Installation**
 
-Output
+1. Clone or copy this whole project and paste it here:
 
-• If registration is successful, navigate to the login page
+   ```
+   /xammp/htdocs/pawpal/
+   ```
 
-• If login is successful, navigate to the home page
+2. Import the database:
 
-• If the save preferences are successful, automate navigation to the home page every time you open
+   * Open *phpMyAdmin*
+   * Create a database: **pawpal_db**
+   * Import the SQL file in server->pawpal_db.sql
 
-Basic validation approach
+3. Configure database connection in **dbconnect.php**:
 
-• Warning the TextField if it is empty
+```php
+<?php
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "pawpal_db";
 
-• Warning the Email TextField if it is an invalid email
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
 
-• Warning the Password TextField if it does not enough 6 characters
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+?>
+```
 
-• Warning the Confirm Password TextField if it does not match with password
+4. Ensure this folder exists for image uploads:
 
-• Warning the Phone TextField if it is < 10 characters or > 11 characters
+```
+pawpal/server/api/uploads/
+```
+---
 
-Splash Screen
+## 📁 Folder Structure
 
-<img width="278" height="645" alt="image" src="https://github.com/user-attachments/assets/a0cd13c8-1541-42cf-8f96-706d11e251c4" />
+```
+pawpal/
+│
+├── server/
+│   ├── api/
+│       ├── dbconnect.php
+│       ├── submit_pet.php
+│       ├── get_my_pets.php
+│       └── ...
+│   ├── uploads/
+│        └── (saved pet images)
+│       
+```
 
-Login Page
+---
 
-<img width="278" height="643" alt="image" src="https://github.com/user-attachments/assets/300f0dcd-e033-4721-8bff-371b71806a15" />
+5. Ensure all plugins are installed and configured based on the platform
 
-Register Page
+```
+http: ^1.5.0
+shared_preferences: ^2.3.2
+geolocator: ^14.0.2
+image_picker: ^1.2.1
+image_cropper: ^11.0.0
+intl: ^0.20.2
+url_launcher: ^6.3.2
+```
 
-<img width="278" height="649" alt="image" src="https://github.com/user-attachments/assets/052c4361-3862-4e5f-8874-3a379400bee6" />
+---
+## 🔌 API Endpoints
 
-Home Page
+| Endpoint                      | Method | Description                                       |
+| ----------------------------- | ------ | --------------------------------------------------|
+| `/server/api/submit_pet.php`  | POST   | Add new pet with multiple images and information  |
+| `/server/api/get_my_pets.php` | GET    | Retrieve all pets and related user info           |
 
-<img width="278" height="652" alt="image" src="https://github.com/user-attachments/assets/b1e91b3f-2cd3-4984-a3d0-dbf4174e3766" />
+
+---
+
+# 🐶 Submit Pet API
+
+### **URL**
+
+```
+POST /pawpal/server/api/submit_pet.php
+```
+
+
+### **Required Fields**
+
+| Field         | Type                | Description                    |
+| ------------- | ------------------- | ------------------------------ |
+| `userid`      | int                 | ID of user                     |
+| `petname`     | string              | Pet name                       |
+| `pettype`     | string              | Pet type (dog, cat, etc.)      |
+| `category`    | string              | Category (adopt, lost, donate) |
+| `description` | string              | Pet description                |
+| `latitude`    | string              | Pet location latitude          |
+| `longitude`   | string              | Pet location longitude         |
+| `images`      | JSON array (base64) | List of base64 image strings   |
+
+---
+
+## 📤 Sample JSON Request (Flutter)
+
+```dart
+{
+  "userid": "12",
+  "name": "Doggie",
+  "type": "Dog",
+  "category": "Donation Request",
+  "latitude": "6.4591117",
+  "longitude": "100.5022967",
+  "description": "He is injured, please help me!",
+  "images": [
+      "97BORw0KGgoAAAANSUhEUgAABk...",
+      "97BORw0KGgzDAsdsadadsAAABBB..."
+  ]
+}
+```
+
+Flutter encoding example:
+
+```dart
+http.post(
+  Uri.parse("${Myconfig.server}/pawpal/server/api/submit_pet.php"),
+  body ： {
+  "userid": userId,
+  "petname": petName,
+  "pettype": petType,
+  "category": category,
+  "description": description,
+  "latitude": lat,
+  "longitude": lng,
+  "images": jsonEncode(base64ImagesList),
+};
+```
+
+---
+
+## 🟢 Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Pet submitted successfully"
+}
+```
+
+## 🔴 Sample Error Response
+
+```json
+{
+  "success": false,
+  "message": "Pet not added"
+}
+```
+
+---
+
+# 🧩 Notes
+
+* All uploaded images are stored inside:
+
+  ```
+  /server/api/uploads/pet_<id>_<index>.png
+  ```
+* `image_paths` in database is stored as **JSON array**.
+
+---
