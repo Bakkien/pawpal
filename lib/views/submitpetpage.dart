@@ -303,10 +303,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                           setState(() {
                             imageError = null;
                           });
-                          if (images[0] == null || webImages[0] == null) {
+                          if (images[0] == null && webImages[0] == null) {
                             imageError = 'Please click on the first one';
                             setState(() {});
-                          } else if (images[1] == null ||
+                          } else if (images[1] == null &&
                               webImages[1] == null) {
                             imageError = 'Please click on the second one';
                             setState(() {});
@@ -652,7 +652,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
               stopLoading();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Submit failed: ${resarray['message']}"),
+                  content: Text("${resarray['message']}"),
                   backgroundColor: Colors.green,
                 ),
               );

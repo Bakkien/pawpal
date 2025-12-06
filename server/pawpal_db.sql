@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2025 at 03:34 PM
+-- Generation Time: Dec 06, 2025 at 02:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -28,15 +28,15 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `tbl_pets` (
-  `pet_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `pet_id` int(11) NOT NULL COMMENT 'Unique ID',
+  `user_id` int(11) NOT NULL COMMENT 'Foreign key to tbl_users',
   `pet_name` varchar(100) NOT NULL,
   `pet_type` varchar(50) NOT NULL,
-  `category` varchar(50) NOT NULL,
+  `category` varchar(50) NOT NULL COMMENT 'Adoption/Donation/Help',
   `description` text DEFAULT NULL,
-  `image_paths` text DEFAULT NULL,
-  `lat` varchar(50) DEFAULT NULL,
-  `lng` varchar(50) DEFAULT NULL,
+  `image_paths` text DEFAULT NULL COMMENT 'JSON or comma-separated list of up to 3 paths',
+  `lat` varchar(50) DEFAULT NULL COMMENT 'Latitude',
+  `lng` varchar(50) DEFAULT NULL COMMENT 'Longitude',
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -46,7 +46,8 @@ CREATE TABLE `tbl_pets` (
 
 INSERT INTO `tbl_pets` (`pet_id`, `user_id`, `pet_name`, `pet_type`, `category`, `description`, `image_paths`, `lat`, `lng`, `created_at`) VALUES
 (1, 2, 'Kittens', 'Cat', 'Adoption', 'Here are 4 adorable kittens. please adopt them!', '[\"image1: ../uploads/pet_1_1.png\"]', '6.4591117', '100.5022967', '2025-12-05 21:41:41'),
-(2, 1, 'Doggie', 'Dog', 'Donation Request', 'He is injured, please help me!', '[\"image1: ../uploads/pet_2_1.png\"]', '6.4591117', '100.5022967', '2025-12-05 21:44:19');
+(2, 1, 'Doggie', 'Dog', 'Donation Request', 'He is injured, please help me!', '[\"image1: ../uploads/pet_2_1.png\"]', '6.4591117', '100.5022967', '2025-12-05 21:44:19'),
+(4, 1, 'Little White', 'Rabbit', 'Help/Rescue', 'Help me, my rabbit is run away from my house.', '[\"image1: ../uploads/pet_4_1.png\",\"image2: ../uploads/pet_4_2.png\",\"image3: ../uploads/pet_4_3.png\"]', '6.4606617', '100.5019317', '2025-12-06 09:00:25');
 
 -- --------------------------------------------------------
 
@@ -96,7 +97,7 @@ ALTER TABLE `tbl_users`
 -- AUTO_INCREMENT for table `tbl_pets`
 --
 ALTER TABLE `tbl_pets`
-  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID', AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbl_users`
