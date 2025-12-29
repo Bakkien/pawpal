@@ -11,7 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         p.user_id,
         p.pet_name,
         p.pet_type,
+        p.gender,
+        p.age,
         p.category,
+        p.health,
         p.description,
         p.lat,
         p.lng,
@@ -24,13 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     ";
 
     // Specific content search
-    if (isset($_GET['search']) && !empty($_GET['search'])) {
+    if (isset($_GET['search']) && !empty($_GET['search']) && isset($_GET['filter']) && !empty($_GET['filter'])) {
         $search = $conn->real_escape_string($_GET['search']);
+        $filter = $conn->real_escape_string($_GET['filter']);
         $sqlsearch = $baseQuery . "
             WHERE p.pet_name LIKE '%$search%' 
-               OR p.pet_type LIKE '%$search%'
-               OR p.category LIKE '%$search%'
+                AND p.pet_type LIKE '%$filter%'
             ORDER BY p.pet_id DESC";
+    } else if (isset($_GET['search']) && !empty($_GET['search'])) {
+        $search = $conn->real_escape_string($_GET['search']);
+        $sqlsearch = $baseQuery . " WHERE p.pet_name LIKE '%$search%' ORDER BY p.pet_id DESC";
+    } else if (isset($_GET['filter']) && !empty($_GET['filter'])) {
+        $filter = $conn->real_escape_string($_GET['filter']);
+        $sqlsearch = $baseQuery . " WHERE p.pet_type LIKE '%$filter%' ORDER BY p.pet_id DESC";
     } else {
         // Search all
         $sqlsearch = $baseQuery . " ORDER BY p.pet_id DESC";
@@ -43,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             $petdata[] = $row;
         }
         $response = array("success" => true, "data" => $petdata);
+        sendJsonResponse($response);
+    } else{
+        $response = array("success" => true, "message" => "No result");
         sendJsonResponse($response);
     }
 } else {

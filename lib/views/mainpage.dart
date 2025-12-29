@@ -6,7 +6,7 @@ import 'package:pawpal/models/user.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:pawpal/views/adoptionrequestpage.dart';
 
 class MainScreen extends StatefulWidget {
   final User? user;
@@ -19,6 +19,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   late double width;
   TextEditingController searchController = TextEditingController();
+  String selectedPetType = 'All';
+  List<String> petTypes = ["All", "Cat", "Dog", "Rabbit", "Other"];
   List<Pet> listPets = [];
   String status = "Loading...";
   DateFormat formatter = DateFormat('dd/MM/yyyy hh:mm a');
@@ -26,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    loadPets('');
+    loadPets('', '');
   }
 
   @override
@@ -57,24 +59,57 @@ class _MainScreenState extends State<MainScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
+                onChanged: (value) {
+                  String filter = selectedPetType;
+                  if (filter != 'All') {
+                    loadPets(value, selectedPetType);
+                  } else if (value.isEmpty) {
+                    loadPets('', '');
+                  } else {
+                    loadPets(value, '');
+                  }
+                },
               ),
-              SizedBox(height: 10),
 
-              // search button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    String search = searchController.text.trim();
-                    if (search.isEmpty) {
-                      loadPets('');
-                    } else {
-                      loadPets(search);
-                    }
-                  },
-                  child: Text('Search'),
+              SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                initialValue: selectedPetType,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.pets),
+                  labelText: 'Pet Type',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
+                icon: Icon(Icons.keyboard_arrow_down),
+                items: petTypes.map((String selectedPetType) {
+                  return DropdownMenuItem<String>(
+                    value: selectedPetType,
+                    child: Text(selectedPetType),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedPetType = newValue!;
+                    String search = searchController.text.trim();
+                    if (selectedPetType == 'All') {
+                      // All always at top if selected
+                      petTypes.remove(selectedPetType);
+                      petTypes.insert(0, selectedPetType);
+                      searchController.clear();
+                      loadPets('', '');
+                    } else {
+                      // move selected at top but All always at second
+                      petTypes.remove(selectedPetType);
+                      petTypes.remove('All');
+                      petTypes.insert(0, selectedPetType);
+                      petTypes.insert(1, 'All');
+                      loadPets(search, selectedPetType);
+                    }
+                  });
+                },
               ),
+
               SizedBox(height: 20),
               Expanded(
                 child: listPets.isEmpty
@@ -85,7 +120,7 @@ class _MainScreenState extends State<MainScreen> {
                           children: [
                             Icon(Icons.inbox, size: 64),
                             Text(
-                              'No submissions yet.',
+                              status,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -117,7 +152,7 @@ class _MainScreenState extends State<MainScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(10),
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   // First image as thumbnail
                                   ClipRRect(
@@ -125,7 +160,7 @@ class _MainScreenState extends State<MainScreen> {
                                     child: Container(
                                       width: width * 0.28, // more responsive
                                       height:
-                                          width * 0.3, // balanced aspect ratio
+                                          width * 0.26, // balanced aspect ratio
                                       color: Colors.grey[200],
                                       child: Image.network(
                                         '${MyConfig.server}/pawpal/server/uploads/pet_${listPets[index].petId}_1.png',
@@ -144,7 +179,6 @@ class _MainScreenState extends State<MainScreen> {
 
                                   const SizedBox(width: 12),
 
-                                  // Space for display pet name, type, category, and description
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -172,9 +206,9 @@ class _MainScreenState extends State<MainScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4),
-                                        // Category
+                                        // Age
                                         Text(
-                                          listPets[index].category.toString(),
+                                          'Age: ${listPets[index].age.toString()}',
                                           style: const TextStyle(
                                             fontSize: 17,
                                             fontWeight: FontWeight.w600,
@@ -183,17 +217,6 @@ class _MainScreenState extends State<MainScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4),
-                                        // Description
-                                        Text(
-                                          listPets[index].description
-                                              .toString(),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black87,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
                                       ],
                                     ),
                                   ),
@@ -222,7 +245,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   // load all pets
-  void loadPets(String searchQuery) {
+  void loadPets(String searchQuery, String filterQuery) {
     listPets.clear();
     setState(() {
       status = "Loading...";
@@ -230,7 +253,7 @@ class _MainScreenState extends State<MainScreen> {
     http
         .get(
           Uri.parse(
-            '${MyConfig.server}/pawpal/server/api/get_my_pets.php?search=$searchQuery',
+            '${MyConfig.server}/pawpal/server/api/get_my_pets.php?search=$searchQuery&filter=$filterQuery',
           ),
         )
         .then((response) {
@@ -249,11 +272,11 @@ class _MainScreenState extends State<MainScreen> {
               setState(() {
                 status = "";
               });
-            } else {
+            } else if (jsonResponse['success']) {
               // success but EMPTY data
               setState(() {
                 listPets.clear();
-                status = jsonResponse['data'].toString();
+                status = jsonResponse['message'].toString();
               });
             }
           } else {
@@ -268,264 +291,157 @@ class _MainScreenState extends State<MainScreen> {
 
   // show all details in dialog using table
   void showDetailsDialog(int index) {
-    String formattedDate = formatter.format(
-      DateTime.parse(listPets[index].createdDate.toString()),
+    final pet = listPets[index];
+    final formattedDate = formatter.format(
+      DateTime.parse(pet.createdDate.toString()),
     );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(listPets[index].petName.toString()),
-          content: SizedBox(
-            width: width,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    child: Image.network(
-                      '${MyConfig.server}/pawpal/server/uploads/pet_${listPets[index].petId}_1.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.broken_image,
-                          size: 128,
-                          color: Colors.grey,
-                        );
-                      },
-                    ),
-                  ),
 
-                  SizedBox(height: 10),
-                  Table(
-                    border: TableBorder.all(
-                      color: Colors.grey,
-                      width: 1.0,
-                      style: BorderStyle.solid,
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.85,
+          minChildSize: 0.6,
+          maxChildSize: 0.95,
+          builder: (_, controller) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: SingleChildScrollView(
+                controller: controller,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // DRAG HANDLE
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade400,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
-                    columnWidths: {
-                      0: FixedColumnWidth(100.0),
-                      1: FlexColumnWidth(),
-                    },
-                    children: [
-                      // table row for pet type
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Pet Type'),
+
+                    // IMAGE
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: AspectRatio(
+                        aspectRatio: 5 / 3,
+                        child: Image.network(
+                          '${MyConfig.server}/pawpal/server/uploads/pet_${listPets[index].petId}_1.png',
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: Colors.grey.shade200,
+                            child: const Icon(
+                              Icons.broken_image,
+                              size: 80,
+                              color: Colors.grey,
                             ),
                           ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(listPets[index].petType.toString()),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                      // table row for category
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Category'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(listPets[index].category.toString()),
-                            ),
-                          ),
-                        ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Pet Name
+                    Text(
+                      '${pet.petName.toString()}, ${pet.gender.toString()}, ${pet.age.toString()}',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
                       ),
-                      // table row for description
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Description'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                listPets[index].description.toString(),
-                              ),
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 10),
+                    // Category & Health
+                    Text(
+                      '${pet.category.toString()}   ${pet.health.toString()}',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
                       ),
-                      // table for location with latitude and longitude
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Location'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                '${listPets[index].latitude}, ${listPets[index].longitude}',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // table for date
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Date'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(formattedDate),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // tale for post by whom
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Post by'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(listPets[index].userName.toString()),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // table for poster's phone
-                      TableRow(
-                        children: [
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Phone'),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(listPets[index].userPhone.toString()),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  // the way of contact to poster
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        onPressed: () async {
-                          await launchUrl(
-                            Uri.parse(
-                              'tel:${listPets[index].userPhone.toString()}',
-                            ),
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                        icon: Icon(Icons.call),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          await launchUrl(
-                            Uri.parse(
-                              'sms:${listPets[index].userPhone.toString()}',
-                            ),
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                        icon: Icon(Icons.message),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          await launchUrl(
-                            Uri.parse(
-                              'mailto:${listPets[index].userEmail.toString()}',
-                            ),
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                        icon: Icon(Icons.email),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          await launchUrl(
-                            Uri.parse(
-                              'https://wa.me/${listPets[index].userPhone.toString()}',
-                            ),
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                        icon: Icon(Icons.wechat),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Description
+                    Text(
+                      pet.description.toString(),
+                      style: const TextStyle(fontSize: 15),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    const Divider(),
+
+                    // INFO SECTION
+                    _infoRow("Posted On", formattedDate),
+                    _infoRow("Posted by", pet.userName),
+                    _infoRow("Phone", pet.userPhone),
+                    _infoRow("Email", pet.userEmail),
+
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: pet.category == 'Adoption'
+                          ? ElevatedButton(
+                              onPressed: () {
+                                if (!mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AdoptionRequestScreen(
+                                      user: widget.user,
+                                      pet: pet,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text('Request to Adopt'),
+                            )
+                          : pet.category == 'Donation Request'
+                          ? ElevatedButton(
+                              onPressed: () {},
+                              child: Text('Donate'),
+                            )
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _infoRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 110,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
               ),
             ),
           ),
-          actions: [
-            TextButton(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+          Expanded(child: Text(value ?? "-")),
+        ],
+      ),
     );
   }
 }

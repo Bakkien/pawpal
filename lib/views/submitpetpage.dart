@@ -22,16 +22,22 @@ class SubmitPetScreen extends StatefulWidget {
 class _SubmitPetScreenState extends State<SubmitPetScreen> {
   late double width;
   TextEditingController petNameController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   List<String> petTypes = ["Cat", "Dog", "Rabbit", "Other"];
+  List<String> gender = ["Male", "Female", "Both"];
   List<String> categories = ["Adoption", "Donation Request", "Help/Rescue"];
-  String selectedPetType = "Other", selectedCategory = "Adoption";
+  List<String> health = ["Healthy", "Critical", "Unknown"];
+  String selectedPetType = "Other",
+      selectedGender = "Male",
+      selectedCategory = "Adoption",
+      selectedHealth = "Healthy";
   late Position position;
   late double lat, lng;
   List<Uint8List?> webImages = [null, null, null];
   List<File?> images = [null, null, null];
-  String? petNameError, descriptionError, locationError, imageError;
+  String? petNameError, ageError, descriptionError, locationError, imageError;
   bool isLoading = false;
 
   @override
@@ -48,22 +54,23 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
         child: SingleChildScrollView(
           child: Container(
             width: width,
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(5),
             margin: EdgeInsets.all(10),
             child: Column(
               children: [
                 // logo
                 Image.asset('assets/images/pet_background.png', scale: 3),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+
                 // pet name
                 Row(
                   children: [
-                    Text('Pet Name', style: TextStyle(fontSize: 16)),
-                    SizedBox(width: 15),
                     Expanded(
+                      flex: 2,
                       child: TextField(
                         controller: petNameController,
                         decoration: InputDecoration(
+                          labelText: 'Pet Name',
                           errorText: petNameError,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -73,17 +80,17 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
-                // pet type
+                const SizedBox(height: 10),
+
                 Row(
                   children: [
-                    Text('Pet Type', style: TextStyle(fontSize: 16)),
-                    SizedBox(width: 24),
+                    // pet type
                     Expanded(
+                      flex: 1,
                       child: DropdownButtonFormField<String>(
                         initialValue: selectedPetType,
                         decoration: InputDecoration(
-                          labelText: 'Select Pet Type',
+                          labelText: 'Pet Type',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -102,19 +109,58 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                         },
                       ),
                     ),
+                    const SizedBox(width: 10),
+                    // gender
+                    Expanded(
+                      flex: 1,
+                      child: DropdownButtonFormField<String>(
+                        initialValue: selectedGender,
+                        decoration: InputDecoration(
+                          labelText: 'Gender',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        items: gender.map((String selectedGender) {
+                          return DropdownMenuItem<String>(
+                            value: selectedGender,
+                            child: Text(selectedGender),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedGender = newValue!;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // age
+                    Expanded(
+                      child: TextField(
+                        controller: ageController,
+                        decoration: InputDecoration(
+                          labelText: 'Age',
+                          errorText: ageError,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: 10),
                 // category
                 Row(
                   children: [
-                    Text('Category', style: TextStyle(fontSize: 16)),
-                    SizedBox(width: 22),
                     Expanded(
+                      flex: 2,
                       child: DropdownButtonFormField<String>(
                         initialValue: selectedCategory,
                         decoration: InputDecoration(
-                          labelText: 'Select Category',
+                          labelText: 'Category',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -133,19 +179,42 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                         },
                       ),
                     ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: selectedHealth,
+                        decoration: InputDecoration(
+                          labelText: 'Health',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        items: health.map((String selectedHealth) {
+                          return DropdownMenuItem<String>(
+                            value: selectedHealth,
+                            child: Text(selectedHealth),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedHealth = newValue!;
+                          });
+                        },
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: 10),
                 // description
                 Row(
                   children: [
-                    Text('Description', style: TextStyle(fontSize: 16)),
-                    SizedBox(width: 5),
                     Expanded(
                       child: TextField(
                         maxLines: 3,
                         controller: descriptionController,
                         decoration: InputDecoration(
+                          labelText: 'Description',
                           errorText: descriptionError,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -159,14 +228,13 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                 // location
                 Row(
                   children: [
-                    Text('Location', style: TextStyle(fontSize: 16)),
-                    SizedBox(width: 26),
                     Expanded(
                       child: TextField(
                         maxLines: 3,
                         controller: locationController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
+                          labelText: 'Location',
                           errorText: locationError,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -514,7 +582,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   void submitValidation() {
     String petName = petNameController.text.trim();
     String petType = selectedPetType;
+    String gender = selectedGender;
+    String age = ageController.text.trim();
     String category = selectedCategory;
+    String health = selectedHealth;
     String description = descriptionController.text.trim();
     String location = locationController.text.trim();
 
@@ -522,6 +593,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
 
     setState(() {
       petNameError = null;
+      ageError = null;
       descriptionError = null;
       locationError = null;
       imageError = null;
@@ -533,6 +605,14 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       });
       return;
     }
+
+    if (ageController.text.trim().isEmpty) {
+      setState(() {
+        ageError = "Required field";
+      });
+      return;
+    }
+
     if (description.isEmpty) {
       setState(() {
         descriptionError = "Required field";
@@ -579,7 +659,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                 submitPet(
                   petName,
                   petType,
+                  gender,
+                  age,
                   category,
+                  health,
                   description,
                   lat.toString(),
                   lng.toString(),
@@ -604,7 +687,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   void submitPet(
     String petName,
     String petType,
+    String gender,
+    String age,
     String category,
+    String health,
     String description,
     String lat,
     String lng,
@@ -636,7 +722,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             'userid': widget.user?.userId,
             'petname': petName,
             'pettype': petType,
+            'gender': gender,
+            'age': age,
             'category': category,
+            'health': health,
             'description': description,
             'latitude': lat,
             'longitude': lng,

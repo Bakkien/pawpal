@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 	exit();
 }
 
-if (!isset($_POST['userid']) || !isset($_POST['petname']) || !isset($_POST['pettype']) || !isset($_POST['category']) || !isset($_POST['description']) || !isset($_POST['latitude']) || !isset($_POST['longitude']) || !isset($_POST['images'])) {
+if (!isset($_POST['userid']) || !isset($_POST['petname']) || !isset($_POST['pettype']) || !isset($_POST['gender']) || !isset($_POST['age']) || !isset($_POST['category']) || !isset($_POST['health']) || !isset($_POST['description']) || !isset($_POST['latitude']) || !isset($_POST['longitude']) || !isset($_POST['images'])) {
 	http_response_code(400);
 	echo json_encode(array("success" => false, "message" => "Bad Request"));
 	exit();
@@ -17,7 +17,10 @@ if (!isset($_POST['userid']) || !isset($_POST['petname']) || !isset($_POST['pett
 $userid = $_POST['userid'];
 $petname = $_POST['petname'];
 $pettype = $_POST['pettype'];
+$gender = $_POST['gender'];
+$age = $_POST['age'];
 $category = $_POST['category'];
+$health = $_POST['health'];
 $description = $_POST['description'];
 $latitude = $_POST['latitude'];
 $longitude = $_POST['longitude'];
@@ -25,8 +28,8 @@ $base64list = json_decode($_POST['images'], true);
 $savedImages = [];
 
 // Insert new pet into database
-$sqlinsertpet = "INSERT INTO `tbl_pets`(`user_id`, `pet_name`, `pet_type`, `category`, `description`, `lat`, `lng`, `image_paths`) 
-	VALUES ('$userid','$petname','$pettype','$category','$description','$latitude','$longitude','')";
+$sqlinsertpet = "INSERT INTO `tbl_pets`(`user_id`, `pet_name`, `pet_type`, `gender`, `age`, `category`, `health`, `description`, `lat`, `lng`, `image_paths`) 
+	VALUES ('$userid','$petname','$pettype','$gender','$age','$category','$health','$description','$latitude','$longitude','')";
 try {
 	if ($conn->query($sqlinsertpet) === TRUE) {
 		$last_id = $conn->insert_id;
@@ -56,7 +59,6 @@ try {
 	$response = array('success' => false, 'message' => $e->getMessage());
 	sendJsonResponse($response);
 }
-
 
 //	function to send json response	
 function sendJsonResponse($sentArray)
