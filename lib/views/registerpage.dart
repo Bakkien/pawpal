@@ -6,14 +6,14 @@ import 'package:pawpal/views/loginpage.dart';
 import 'package:http/http.dart' as http;
 import 'package:pawpal/models/user.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterScreenState extends State<RegisterScreen> {
   late double width;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -171,7 +171,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
+                        builder: (context) => const LoginScreen(),
                       ),
                     );
                   },
@@ -312,7 +312,7 @@ class _RegisterPageState extends State<RegisterPage> {
               Navigator.pop(context); // Close the registration page
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             } else {
               if (!mounted) return;

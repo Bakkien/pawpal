@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:pawpal/models/user.dart';
-import 'package:pawpal/views/loginpage.dart';
+import 'package:pawpal/shared/mydrawer.dart';
 import 'package:pawpal/views/mainpage.dart';
 import 'package:pawpal/views/submitpetpage.dart';
 
-class HomePage extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   final User? user;
-  const HomePage({super.key, required this.user});
+  const HomeScreen({super.key, required this.user});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
+  late double width;
   @override
   Widget build(BuildContext context) {
+    width = MediaQuery.of(context).size.width;
+    if (width > 600) {
+      width = 600;
+    } else {
+      width = width;
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Page'),
-
-        // icon logout for logout the account
-        actions: [IconButton(onPressed: logout, icon: Icon(Icons.logout))],
       ),
       body: Center(
         child: Padding(
@@ -84,14 +88,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: Icon(Icons.add),
       ),
-    );
-  }
-
-  // logout the account
-  void logout() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      drawer: MyDrawer(user: widget.user),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:pawpal/models/pet.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,15 +11,16 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:http/http.dart' as http;
 
-class SubmitPetScreen extends StatefulWidget {
+class UpdatePetScreen extends StatefulWidget {
   final User? user;
-  const SubmitPetScreen({super.key, required this.user});
+  final Pet? pet;
+  const UpdatePetScreen({super.key, required this.user, required this.pet});
 
   @override
-  State<SubmitPetScreen> createState() => _SubmitPetScreenState();
+  State<UpdatePetScreen> createState() => _UpdatePetScreenState();
 }
 
-class _SubmitPetScreenState extends State<SubmitPetScreen> {
+class _UpdatePetScreenState extends State<UpdatePetScreen> {
   late double width;
   TextEditingController petNameController = TextEditingController();
   TextEditingController ageController = TextEditingController();
@@ -38,6 +40,25 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   List<File?> images = [null, null, null];
   String? petNameError, ageError, descriptionError, locationError, imageError;
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPet();
+  }
+
+  void _loadPet() {
+    petNameController.text = widget.pet!.petName ?? '';
+    selectedPetType = widget.pet!.petType ?? 'Other';
+    selectedGender = widget.pet!.gender ?? 'Male';
+    ageController.text = widget.pet!.age ?? '';
+    selectedCategory = widget.pet!.category ?? 'Adoption';
+    selectedHealth = widget.pet!.health ?? 'Healthy';
+    descriptionController.text = widget.pet!.description ?? '';
+    locationController.text =
+        '${widget.pet!.latitude ?? 0}, ${widget.pet!.longitude ?? 0}';
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -743,7 +764,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             if (resarray['success']) {
               if (!mounted) return;
               stopLoading();
-              Navigator.pop(context);// cant pushreplacement idk why
+              Navigator.pop(context); // cant pushreplacement idk why
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("${resarray['message']}"),

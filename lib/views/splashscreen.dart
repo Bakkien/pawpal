@@ -69,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomePage(user: user),
+                          builder: (context) => HomeScreen(user: user),
                         ),
                       );
                     });
@@ -86,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   if (!mounted) return;
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
                   );
                 },
               );
@@ -105,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     });
   }

@@ -8,14 +8,14 @@ import 'package:http/http.dart' as http;
 import 'package:pawpal/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   late double width;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
+                        builder: (context) => const RegisterScreen(),
                       ),
                     );
                   },
@@ -296,7 +296,7 @@ class _LoginPageState extends State<LoginPage> {
               stopLoading();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage(user: user)),
+                MaterialPageRoute(builder: (context) => HomeScreen(user: user)),
               );
             } else {
               if (!mounted) return;
@@ -336,7 +336,7 @@ class _LoginPageState extends State<LoginPage> {
   // close the status of loading on screen
   void stopLoading() {
     if (isLoading) {
-      Navigator.pop(context); // Close the loading dialog
+      Navigator.of(context).pop(); // Close the loading dialog
       setState(() {
         isLoading = false;
       });

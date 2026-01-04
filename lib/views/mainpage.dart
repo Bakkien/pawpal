@@ -7,6 +7,9 @@ import 'package:pawpal/myconfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:pawpal/views/adoptionrequestpage.dart';
+import 'package:pawpal/shared/mydrawer.dart';
+import 'package:pawpal/views/donationpage.dart';
+import 'package:pawpal/views/editpetpag.dart';
 
 class MainScreen extends StatefulWidget {
   final User? user;
@@ -24,6 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Pet> listPets = [];
   String status = "Loading...";
   DateFormat formatter = DateFormat('dd/MM/yyyy hh:mm a');
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -126,13 +130,6 @@ class _MainScreenState extends State<MainScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(
-                              status,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                           ],
                         ),
                       )
@@ -163,7 +160,7 @@ class _MainScreenState extends State<MainScreen> {
                                           width * 0.26, // balanced aspect ratio
                                       color: Colors.grey[200],
                                       child: Image.network(
-                                        '${MyConfig.server}/pawpal/server/uploads/pet_${listPets[index].petId}_1.png',
+                                        '${MyConfig.server}/pawpal/server/uploads/pet/pet_${listPets[index].petId}_1.png',
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) {
@@ -241,12 +238,12 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
       ),
+      drawer: MyDrawer(user: widget.user),
     );
   }
 
   // load all pets
   void loadPets(String searchQuery, String filterQuery) {
-    listPets.clear();
     setState(() {
       status = "Loading...";
     });
@@ -336,7 +333,7 @@ class _MainScreenState extends State<MainScreen> {
                       child: AspectRatio(
                         aspectRatio: 5 / 3,
                         child: Image.network(
-                          '${MyConfig.server}/pawpal/server/uploads/pet_${listPets[index].petId}_1.png',
+                          '${MyConfig.server}/pawpal/server/uploads/pet/pet_${listPets[index].petId}_1.png',
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             color: Colors.grey.shade200,
@@ -388,31 +385,70 @@ class _MainScreenState extends State<MainScreen> {
 
                     const SizedBox(height: 20),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: pet.category == 'Adoption'
-                          ? ElevatedButton(
-                              onPressed: () {
-                                if (!mounted) return;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AdoptionRequestScreen(
-                                      user: widget.user,
-                                      pet: pet,
+                    // check if user id != pet. user id then show button else edit and delete
+                    widget.user!.userId != pet.userId
+                        ? SizedBox(
+                            width: double.infinity,
+                            child: pet.category == 'Adoption'
+                                ? ElevatedButton(
+                                    onPressed: () {
+                                      if (!mounted) return;
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              AdoptionRequestScreen(
+                                                user: widget.user,
+                                                pet: listPets[index],
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text('Request to Adopt'),
+                                  )
+                                : pet.category == 'Donation Request'
+                                ? ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DonationScreen(
+                                                user: widget.user!,
+                                                pet: listPets[index],
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text('Donate'),
+                                  )
+                                : null,
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  showDeleteDialog(index);
+                                },
+                                icon: const Icon(Icons.delete, size: 24),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UpdatePetScreen(
+                                        user: widget.user,
+                                        pet: listPets[index],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                              child: Text('Request to Adopt'),
-                            )
-                          : pet.category == 'Donation Request'
-                          ? ElevatedButton(
-                              onPressed: () {},
-                              child: Text('Donate'),
-                            )
-                          : null,
-                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.edit, size: 24),
+                              ),
+                            ],
+                          ),
                   ],
                 ),
               ),
@@ -443,5 +479,113 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
+  }
+
+  void showDeleteDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Delete"),
+          content: const Text("Are you sure you want to delete this request?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Delete"),
+              onPressed: () {
+                deletePet(index);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deletePet(int index) {
+    setState(() {
+      isLoading = true;
+    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Loading...'),
+            ],
+          ),
+        );
+      },
+      barrierDismissible: false,
+    );
+    http
+        .post(
+          Uri.parse('${MyConfig.server}/pawpal/server/api/delete_pet.php'),
+          body: {
+            'userid': widget.user!.userId.toString(),
+            'petid': listPets[index].petId.toString(),
+          },
+        )
+        .then((response) {
+          if (response.statusCode == 200) {
+            var jsonResponse = response.body;
+            var resarray = jsonDecode(jsonResponse);
+            if (resarray['success']) {
+              loadPets('', '');
+              if (!mounted) return;
+              stopLoading();
+              Navigator.pop(context); // close DraggableScrollableShee
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Pet deleted successfully"),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              if (!mounted) return;
+              stopLoading();
+              Navigator.pop(context); // close DraggableScrollableShee
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Pet deletion failed"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+            setState(() {});
+          }
+        })
+        .timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            if (!mounted) return;
+            stopLoading();
+            Navigator.pop(context); // close DraggableScrollableShee
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Request timed out. Please try again.'),
+              ),
+            );
+          },
+        );
+  }
+
+  // close the status of loading on screen
+  void stopLoading() {
+    if (isLoading) {
+      Navigator.pop(context); // Close the loading dialog
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }
