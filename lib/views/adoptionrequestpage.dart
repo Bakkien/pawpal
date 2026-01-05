@@ -214,7 +214,7 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
     String houseType = selectedHouse;
     String owned = selectedOwn;
     String reason = reasonController.text.trim();
-    String status = 'Approved';
+    String status = 'Pending';
 
     setState(() {
       reasonError = null;

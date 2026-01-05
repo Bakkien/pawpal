@@ -587,7 +587,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     String health = selectedHealth;
     String description = descriptionController.text.trim();
     String location = locationController.text.trim();
-    String status = 'Requesting';
 
     List<String> base64images = [];
 
@@ -667,7 +666,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   lat.toString(),
                   lng.toString(),
                   base64images,
-                  status,
                 );
                 Navigator.of(context).pop();
               },
@@ -697,7 +695,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     String lat,
     String lng,
     List<String?> base64images,
-    String status,
   ) {
     setState(() {
       isLoading = true;
@@ -733,7 +730,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             'latitude': lat,
             'longitude': lng,
             'images': jsonEncode(base64images),
-            'status': status,
           },
         )
         .then((response) {

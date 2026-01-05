@@ -9,7 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:pawpal/views/adoptionrequestpage.dart';
 import 'package:pawpal/shared/mydrawer.dart';
 import 'package:pawpal/views/donationpage.dart';
-import 'package:pawpal/views/editpetpag.dart';
+import 'package:pawpal/views/editpetpage.dart';
+import 'package:pawpal/views/submitpetpage.dart';
 
 class MainScreen extends StatefulWidget {
   final User? user;
@@ -44,7 +45,19 @@ class _MainScreenState extends State<MainScreen> {
       width = width;
     }
     return Scaffold(
-      appBar: AppBar(title: Text('Pet Adoption & Donation')),
+      appBar: AppBar(
+        title: Text('Pet Adoption & Donation'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              loadPets('', '');
+              searchController.clear();
+              selectedPetType = 'All';
+            },
+            icon: Icon(Icons.refresh),
+          ),
+        ],
+      ),
       body: Center(
         child: Container(
           width: width,
@@ -237,6 +250,17 @@ class _MainScreenState extends State<MainScreen> {
             ],
           ),
         ),
+      ), // add submission
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SubmitPetScreen(user: widget.user),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
       ),
       drawer: MyDrawer(user: widget.user),
     );
@@ -333,7 +357,7 @@ class _MainScreenState extends State<MainScreen> {
                       child: AspectRatio(
                         aspectRatio: 5 / 3,
                         child: Image.network(
-                          '${MyConfig.server}/pawpal/server/uploads/pet/pet_${listPets[index].petId}_1.png',
+                          '${MyConfig.server}/pawpal/server/uploads/pet/pet_${pet.petId}_1.png',
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             color: Colors.grey.shade200,
@@ -391,6 +415,10 @@ class _MainScreenState extends State<MainScreen> {
                             width: double.infinity,
                             child: pet.category == 'Adoption'
                                 ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Colors.white,
+                                    ),
                                     onPressed: () {
                                       if (!mounted) return;
                                       Navigator.push(
@@ -399,7 +427,7 @@ class _MainScreenState extends State<MainScreen> {
                                           builder: (context) =>
                                               AdoptionRequestScreen(
                                                 user: widget.user,
-                                                pet: listPets[index],
+                                                pet: pet,
                                               ),
                                         ),
                                       );
@@ -408,15 +436,18 @@ class _MainScreenState extends State<MainScreen> {
                                   )
                                 : pet.category == 'Donation Request'
                                 ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFFFD700),
+                                      foregroundColor: Colors.white,
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              DonationScreen(
-                                                user: widget.user!,
-                                                pet: listPets[index],
-                                              ),
+                                          builder: (context) => DonationScreen(
+                                            user: widget.user!,
+                                            pet: pet,
+                                          ),
                                         ),
                                       );
                                     },

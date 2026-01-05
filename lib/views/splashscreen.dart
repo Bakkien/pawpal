@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:pawpal/models/user.dart';
-import 'package:pawpal/views/homepage.dart';
+import 'package:pawpal/views/mainpage.dart';
 import 'package:pawpal/views/loginpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -69,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(user: user),
+                          builder: (context) => MainScreen(user: user),
                         ),
                       );
                     });

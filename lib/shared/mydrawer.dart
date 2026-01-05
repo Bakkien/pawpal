@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:pawpal/shared/animated_route.dart';
 import 'package:pawpal/views/adoptionpage.dart';
 import 'package:pawpal/views/donationhistorypage.dart';
 import 'package:pawpal/views/loginpage.dart';
-import 'package:pawpal/views/homepage.dart';
 import 'package:pawpal/views/mainpage.dart';
 import 'package:pawpal/views/profilepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -74,17 +72,6 @@ class _MyDrawerState extends State<MyDrawer> {
             accountName: Text(name ?? widget.user!.userName.toString()),
             accountEmail: Text(email ?? widget.user!.userEmail.toString()),
             decoration: BoxDecoration(color: Colors.blue),
-          ),
-          ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                AnimatedRoute.slideFromRight(HomeScreen(user: widget.user)),
-              );
-            },
           ),
           ListTile(
             leading: Icon(Icons.pets),

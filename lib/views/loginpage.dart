@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:pawpal/myconfig.dart';
-import 'package:pawpal/views/homepage.dart';
+import 'package:pawpal/views/mainpage.dart';
 import 'package:pawpal/views/registerpage.dart';
 import 'package:http/http.dart' as http;
 import 'package:pawpal/models/user.dart';
@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
     loginUser(email, password);
   }
 
-  // user login to home page
+  // user login to main screen
   void loginUser(String email, String password) async {
     setState(() {
       isLoading = true;
@@ -296,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
               stopLoading();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen(user: user)),
+                MaterialPageRoute(builder: (context) => MainScreen(user: user)),
               );
             } else {
               if (!mounted) return;
