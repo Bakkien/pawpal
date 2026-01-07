@@ -598,10 +598,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .post(
           Uri.parse('${MyConfig.server}/pawpal/server/api/update_profile.php'),
           body: {
-            'user_id': widget.user.userId,
-            'user_avatar': base64image,
-            'user_name': name,
-            'user_phone': phone,
+            'userid': widget.user.userId,
+            'useravatar': base64image,
+            'username': name,
+            'userphone': phone,
           },
         )
         .then((response) {

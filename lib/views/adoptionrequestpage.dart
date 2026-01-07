@@ -202,9 +202,14 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                 ),
 
                 const SizedBox(height: 30),
+                // Request button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white
+                  ),
                     onPressed: showRequestDialog,
                     child: Text('Request'),
                   ),
@@ -307,8 +312,8 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
             '${MyConfig.server}/pawpal/server/api/submit_adoption_request.php',
           ),
           body: {
-            'petId': petId,
-            'userId': userId,
+            'petid': petId,
+            'userid': userId,
             'houseType': houseType,
             'owned': owned,
             'reason': reason,

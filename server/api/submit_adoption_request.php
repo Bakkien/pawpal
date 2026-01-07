@@ -8,14 +8,14 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 	exit();
 }
 
-if (!isset($_POST['petId']) || !isset($_POST['userId']) || !isset($_POST['houseType']) || !isset($_POST['owned']) || !isset($_POST['reason']) || !isset($_POST['status'])) {
+if (!isset($_POST['petid']) || !isset($_POST['userid']) || !isset($_POST['houseType']) || !isset($_POST['owned']) || !isset($_POST['reason']) || !isset($_POST['status'])) {
 	http_response_code(400);
 	echo json_encode(array("success" => false, "message" => "Bad Request"));
 	exit();
 }
 
-$petid = $_POST['petId'];
-$userid = $_POST['userId'];
+$petid = $_POST['petid'];
+$userid = $_POST['userid'];
 $housetype = $_POST['houseType'];
 $owned = $_POST['owned'];
 $reason = $_POST['reason'];
@@ -26,12 +26,7 @@ $sqlinsertadoption = "INSERT INTO `tbl_adoptions`(`pet_id`, `user_id`, `house_ty
 	VALUES ('$petid','$userid','$housetype','$owned','$reason', '$status')";
 try {
 	if ($conn->query($sqlinsertadoption) === TRUE) {
-	    $updatepetadopt = "UPDATE `tbl_pets` SET `is_adopted` = 1 WHERE `pet_id` = '$petid'";
-	    if($conn->query($updatepetadopt) === TRUE){
-	        $response = array('success' => true, 'message' => 'Adoption request successful');
-	    }else{
-	        $response = array('success' => false, 'message' => 'Adoption request failed');
-	    }
+	   $response = array('success' => true, 'message' => 'Adoption request successful');
 	} else {
 		$response = array('success' => false, 'message' => 'Adoption request failed');
 	}

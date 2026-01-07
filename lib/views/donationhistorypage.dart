@@ -210,7 +210,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
     http
         .get(
           Uri.parse(
-            '${MyConfig.server}/pawpal/server/api/get_my_donations.php?user_id=${widget.user!.userId}',
+            '${MyConfig.server}/pawpal/server/api/get_my_donations.php?userid=${widget.user!.userId}',
           ),
         )
         .then((response) {

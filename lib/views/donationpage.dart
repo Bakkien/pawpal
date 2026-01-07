@@ -213,9 +213,14 @@ class _DonationScreenState extends State<DonationScreen> {
               ),
 
               const SizedBox(height: 30),
+              // Donate button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white
+                  ),
                   onPressed: () {
                     donateDialog();
                   },
