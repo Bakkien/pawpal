@@ -38,7 +38,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
       width = width;
     }
     return Scaffold(
-      appBar: AppBar(title: Text('Pet Adoption & Donation')),
+      appBar: AppBar(title: Text('Adoption Request')),
       body: Center(
         child: Container(
           width: width,
@@ -49,7 +49,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
             children: [
               Expanded(
                 child: listAdoptions.isEmpty
-                    // show no submission if empty list
+                    // show no result if empty list
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -65,7 +65,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                           ],
                         ),
                       )
-                    // show the list of pets
+                    // show the list of adoptions
                     : ListView.builder(
                         itemCount: listAdoptions.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -113,9 +113,11 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+
                                         // Pet Name
                                         Text(
-                                          'Name: ${listAdoptions[index].petName.toString()}',
+                                          listAdoptions[index].petName
+                                              .toString(),
                                           style: const TextStyle(
                                             fontSize: 17,
                                             fontWeight: FontWeight.w600,
@@ -124,20 +126,22 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4),
+
                                         // Other User Name
                                         Text(
                                           listAdoptions[index].userId ==
                                                   widget.user!.userId
-                                              ? 'Pet Owner: ${listAdoptions[index].otherUserName.toString()}'
+                                              ? 'Owner: ${listAdoptions[index].otherUserName.toString()}'
                                               : 'Adopter: ${listAdoptions[index].otherUserName.toString()}',
                                           style: const TextStyle(
-                                            fontSize: 17,
+                                            fontSize: 14,
                                             fontWeight: FontWeight.w600,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4),
+
                                         // Date
                                         Text(
                                           formatter.format(
@@ -147,13 +151,38 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                                             ),
                                           ),
                                           style: const TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                            color: Colors.grey,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4),
+
+                                        // Status
+                                        Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                listAdoptions[index].status.toString() == 'Pending'
+                                                ? Colors.grey
+                                                : listAdoptions[index].status.toString() == 'Approve'
+                                                ? Colors.green
+                                                : Colors.red,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            listAdoptions[index].status
+                                                .toString(),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -296,9 +325,10 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     const Divider(),
 
+                    // Other User Details
                     Text(
                       adoption.userId == widget.user!.userId
                           ? 'Pet Owner Details'
@@ -310,27 +340,46 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                     ),
                     const SizedBox(height: 16),
                     // INFO SECTION
-                    _infoRow("Name", adoption.otherUserName),
-                    _infoRow("Email", adoption.otherUserEmail),
-                    _infoRow("Phone", adoption.otherUserPhone),
-                    _infoRow('House Type', adoption.houseType),
-                    _infoRow('Pet Owned Before', adoption.owned),
-                    _infoRow('Reason', adoption.reason),
-                    _infoRow("Requested On", formattedDate),
+                    adoption.userId == widget.user!.userId
+                        ? Column(
+                            children: [
+                              // Pet Owner Details
+                              _infoRow("Name", adoption.otherUserName),
+                              _infoRow("Email", adoption.otherUserEmail),
+                              _infoRow("Phone", adoption.otherUserPhone),
+                              _infoRow("Requested On", formattedDate),
+                              _infoRow("Status", adoption.status),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              // Adopter Details
+                              _infoRow("Name", adoption.otherUserName),
+                              _infoRow("Email", adoption.otherUserEmail),
+                              _infoRow("Phone", adoption.otherUserPhone),
+                              _infoRow('House Type', adoption.houseType),
+                              _infoRow('Pet Owned Before', adoption.owned),
+                              _infoRow('Reason', adoption.reason),
+                              _infoRow("Requested On", formattedDate),
+                              _infoRow("Status", adoption.status),
+                            ],
+                          ),
 
                     const SizedBox(height: 20),
 
                     Column(
                       children: [
-                        // Show buttons only if current user is the pet owner
-                        if (listAdoptions[index].userId !=
-                            widget.user!.userId) // current user != adopter
+                        // Show buttons only if current user is the pet owner and status is pending
+                        if (adoption.userId != widget.user!.userId &&
+                            adoption.status ==
+                                'Pending')
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
                                 ),
                                 onPressed: () {
                                   updateAdoptionRequest(
@@ -345,6 +394,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
                                 ),
                                 onPressed: () {
                                   updateAdoptionRequest(
@@ -369,6 +419,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
     );
   }
 
+ // UI Helper
   Widget _infoRow(String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -376,7 +427,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 110,
+            width: 140,
             child: Text(
               label,
               style: TextStyle(
@@ -391,7 +442,12 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
     );
   }
 
-  void updateAdoptionRequest(String? adoptionId, String? petId, String status) async {
+  // update adoption status and pet was adopted or not adopted
+  void updateAdoptionRequest(
+    String? adoptionId,
+    String? petId,
+    String status,
+  ) async {
     setState(() {
       isLoading = true;
     });
@@ -422,12 +478,18 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
               if (!mounted) return;
               stopLoading();
               Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("${resarray['message']}"),
+                  backgroundColor: Colors.green,
+                ),
+              );
             } else {
               if (!mounted) return;
               stopLoading();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Update failed: ${resarray['message']}"),
+                  content: Text("${resarray['message']}"),
                   backgroundColor: Colors.red,
                 ),
               );

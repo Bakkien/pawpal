@@ -89,6 +89,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
 
               SizedBox(height: 10),
+              // Filter
               DropdownButtonFormField<String>(
                 initialValue: selectedPetType,
                 decoration: InputDecoration(
@@ -289,7 +290,6 @@ class _MainScreenState extends State<MainScreen> {
               for (var item in jsonResponse['data']) {
                 listPets.add(Pet.fromJson(item));
               }
-
               setState(() {
                 status = "";
               });
@@ -382,15 +382,27 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Category & Health
+
+                    // Category
                     Text(
-                      '${pet.category.toString()}   ${pet.health.toString()}',
+                      pet.category.toString(),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    //Health
+                    Text(
+                      'Health: ${pet.health.toString()}',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
+
                     // Description
                     Text(
                       pet.description.toString(),
@@ -398,7 +410,6 @@ class _MainScreenState extends State<MainScreen> {
                     ),
 
                     const SizedBox(height: 20),
-
                     const Divider(),
 
                     // INFO SECTION
@@ -460,12 +471,6 @@ class _MainScreenState extends State<MainScreen> {
                             children: [
                               IconButton(
                                 onPressed: () {
-                                  showDeleteDialog(index);
-                                },
-                                icon: const Icon(Icons.delete, size: 24),
-                              ),
-                              IconButton(
-                                onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -476,7 +481,13 @@ class _MainScreenState extends State<MainScreen> {
                                     ),
                                   );
                                 },
-                                icon: const Icon(Icons.edit, size: 24),
+                                icon: const Icon(Icons.edit, size: 24, color: Colors.blue),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  showDeleteDialog(index);
+                                },
+                                icon: const Icon(Icons.delete, size: 24, color: Colors.red),
                               ),
                             ],
                           ),
@@ -490,6 +501,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  // UI Helper
   Widget _infoRow(String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

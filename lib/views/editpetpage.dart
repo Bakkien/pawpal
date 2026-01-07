@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:http/http.dart' as http;
+import 'package:pawpal/views/mainpage.dart';
 
 class UpdatePetScreen extends StatefulWidget {
   final User? user;
@@ -47,7 +48,8 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
     _loadPet();
   }
 
-  void _loadPet() {
+  // load selected pet
+  void _loadPet() async {
     petNameController.text = widget.pet!.petName ?? '';
     selectedPetType = widget.pet!.petType ?? 'Other';
     selectedGender = widget.pet!.gender ?? 'Male';
@@ -55,8 +57,12 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
     selectedCategory = widget.pet!.category ?? 'Adoption';
     selectedHealth = widget.pet!.health ?? 'Healthy';
     descriptionController.text = widget.pet!.description ?? '';
+    lat = double.tryParse(widget.pet!.latitude.toString()) ?? 0.0;
+    lng = double.tryParse(widget.pet!.longitude.toString()) ?? 0.0;
+    List<Placemark> placemarks = await placemarkFromCoordinates(lat,lng);
+    Placemark place = placemarks[0];
     locationController.text =
-        '${widget.pet!.latitude ?? 0}, ${widget.pet!.longitude ?? 0}';
+        "${place.name},\n${place.postalCode},${place.locality},\n${place.administrativeArea},${place.country}";
     setState(() {});
   }
 
@@ -130,6 +136,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
+
                     // gender
                     Expanded(
                       flex: 1,
@@ -156,6 +163,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
+
                     // age
                     Expanded(
                       child: TextField(
@@ -172,6 +180,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+
                 // category
                 Row(
                   children: [
@@ -200,6 +209,8 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
+
+                    // health
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: selectedHealth,
@@ -226,6 +237,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+
                 // description
                 Row(
                   children: [
@@ -245,6 +257,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+
                 // location
                 Row(
                   children: [
@@ -282,6 +295,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+
                 // image upload maximum up to 3
                 Row(
                   children: [
@@ -741,8 +755,9 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
 
     http
         .post(
-          Uri.parse('${MyConfig.server}/pawpal/server/api/submit_pet.php'),
+          Uri.parse('${MyConfig.server}/pawpal/server/api/update_pet.php'),
           body: {
+            'petid': widget.pet?.petId,
             'userid': widget.user?.userId,
             'petname': petName,
             'pettype': petType,
@@ -754,7 +769,6 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
             'latitude': lat,
             'longitude': lng,
             'images': jsonEncode(base64images),
-            'status': status,
           },
         )
         .then((response) {
@@ -764,7 +778,12 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
             if (resarray['success']) {
               if (!mounted) return;
               stopLoading();
-              Navigator.pop(context); // cant pushreplacement idk why
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainScreen(user: widget.user),
+                ),
+              );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("${resarray['message']}"),
@@ -776,7 +795,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
               stopLoading();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Submit failed: ${resarray['message']}"),
+                  content: Text("Update failed: ${resarray['message']}"),
                   backgroundColor: Colors.red,
                 ),
               );

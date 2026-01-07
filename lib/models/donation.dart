@@ -6,7 +6,12 @@ class Donation{
   String? amount;
   String? description;
   String? donationDate;
+
+  // Added pet name
   String? petName;
+
+  // Added other user name
+  String? otherUserName;
 
   Donation({
   this.donationId,
@@ -16,7 +21,10 @@ class Donation{
   this.amount,
   this.description,
   this.donationDate,
-  this.petName
+
+  this.petName,
+
+  this.otherUserName
 });
 
 Donation.fromJson(Map<String, dynamic> json){
@@ -27,7 +35,10 @@ Donation.fromJson(Map<String, dynamic> json){
   amount = json['amount'];
   description = json['description'];
   donationDate = json['donation_date'];
+
   petName = json['pet_name'];
+
+  otherUserName = json['other_user_name'];
 }
 
 Map<String, dynamic> toJson(){
@@ -39,7 +50,10 @@ Map<String, dynamic> toJson(){
   data['amount'] = amount;
   data['description'] = description;
   data['donation_date'] = donationDate;
+
   data['pet_name'] = petName;
+
+  data['other_user_name'] = otherUserName;
 
   return data;
 }

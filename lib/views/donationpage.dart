@@ -130,6 +130,8 @@ class _DonationScreenState extends State<DonationScreen> {
                 ),
               ),
               const Divider(height: 40),
+
+              // Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: SizedBox(
@@ -152,6 +154,8 @@ class _DonationScreenState extends State<DonationScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Donation Type
               DropdownButtonFormField<String>(
                 initialValue: selectedDonation,
                 decoration: InputDecoration(
@@ -177,6 +181,8 @@ class _DonationScreenState extends State<DonationScreen> {
                 },
               ),
               const SizedBox(height: 10),
+
+              // Amount
               TextField(
                 controller: amountController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -192,6 +198,8 @@ class _DonationScreenState extends State<DonationScreen> {
                 ),
               ),
               const SizedBox(height: 10),
+
+              // Description
               TextField(
                 controller: descController,
                 maxLines: 3,
@@ -221,8 +229,9 @@ class _DonationScreenState extends State<DonationScreen> {
     );
   }
 
-    void loadUserWallet(){
-        http
+  // load user wallet
+  void loadUserWallet() {
+    http
         .get(
           Uri.parse(
             '${MyConfig.server}/pawpal/server/api/get_user_details.php?userid=${widget.user.userId}',
@@ -240,7 +249,7 @@ class _DonationScreenState extends State<DonationScreen> {
           }
         });
   }
-  
+
   void donateDialog() {
     String donationType = selectedDonation;
     String description = descController.text.trim();
@@ -252,7 +261,7 @@ class _DonationScreenState extends State<DonationScreen> {
       amountError = null;
     });
 
-    // Validation for Money
+    // Amount validation
     if (donationType == 'Money') {
       if (amountText.isEmpty || amount <= 0) {
         setState(() {
@@ -269,6 +278,7 @@ class _DonationScreenState extends State<DonationScreen> {
       }
     }
 
+    // Description validation
     if (description.isEmpty) {
       setState(() {
         descError = "Please enter description";
@@ -347,7 +357,12 @@ class _DonationScreenState extends State<DonationScreen> {
             if (resarray['success']) {
               if (!mounted) return;
               stopLoading();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> MainScreen(user: widget.user)));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainScreen(user: widget.user),
+                ),
+              );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("${resarray['message']}"),
@@ -487,7 +502,7 @@ class _DonationScreenState extends State<DonationScreen> {
                     }
                   },
                   child: const Text(
-                    "Continue",
+                    "Next",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

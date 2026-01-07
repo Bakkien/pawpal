@@ -106,12 +106,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 : kIsWeb
                                 ? (webImage != null
                                       ? MemoryImage(webImage!)
+                                      : widget.user.userAvatar != null
+                                      ? NetworkImage(
+                                          '${MyConfig.server}/pawpal/server/uploads/profile/user_${widget.user.userId}.png',
+                                        )
                                       : null)
-                                : (image != null ? FileImage(image!) : null),
+                                : (image != null
+                                      ? FileImage(image!)
+                                      : widget.user.userAvatar != null
+                                      ? NetworkImage(
+                                          '${MyConfig.server}/pawpal/server/uploads/profile/user_${widget.user.userId}.png',
+                                        )
+                                      : null),
                             child:
                                 (savedAvatar == null &&
                                     image == null &&
-                                    webImage == null)
+                                    webImage == null &&
+                                    widget.user.userAvatar == null)
                                 ? Text(
                                     widget.user.userName
                                             ?.substring(0, 1)
@@ -131,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         const SizedBox(height: 20),
-
+                        // uneditable field
                         _readonlyField("Email", widget.user.userEmail),
                         _readonlyField(
                           "Registered",
@@ -235,6 +246,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const Divider(height: 30),
                         const SizedBox(height: 8),
+
+                        // editable field
                         _inputField(
                           controller: nameController,
                           label: "Name",
@@ -313,7 +326,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void showTopUpDialog() {
     double selectedTopUp = 10.00;
 
-    List<double> topUpPriceMap = [5.00, 10.00, 15.00, 20.00, 30.00, 40.00, 50.00, 100.00];
+    List<double> topUpPriceMap = [
+      5.00,
+      10.00,
+      15.00,
+      20.00,
+      30.00,
+      40.00,
+      50.00,
+      100.00,
+    ];
 
     showDialog(
       context: context,
@@ -356,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     items: topUpPriceMap.map((double money) {
                       return DropdownMenuItem<double>(
                         value: money,
-                        child: Text("RM ${money.toStringAsFixed(2)}")
+                        child: Text("RM ${money.toStringAsFixed(2)}"),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -388,7 +410,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         MaterialPageRoute(
                           builder: (_) => PaymentScreen(
                             user: widget.user,
-                            money: double.parse(selectedTopUp.toStringAsFixed(2)),
+                            money: double.parse(
+                              selectedTopUp.toStringAsFixed(2),
+                            ),
                           ),
                         ),
                       );
@@ -396,7 +420,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     loadProfile();
                   },
                   child: const Text(
-                    "Continue",
+                    "Next",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -408,6 +432,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // UI Helper
   Widget _inputField({
     required TextEditingController controller,
     required String label,
@@ -447,6 +472,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
   }
 
+  // choose image source
   void pickimagedialog() {
     showDialog(
       context: context,
@@ -479,6 +505,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // open camera to get image
   Future<void> openCamera() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
@@ -494,6 +521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // open gallery to get image
   Future<void> openGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -509,6 +537,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // crop the selected image
   Future<void> cropImage() async {
     if (kIsWeb) return; // skip cropping on web
     CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -534,7 +563,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String base64image = "";
     if (kIsWeb) {
       base64image = base64Encode(webImage!);
-    } else if(image != null){
+    } else if (image != null) {
       base64image = base64Encode(image!.readAsBytesSync());
     }
     String name = nameController.text.trim();
@@ -598,7 +627,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             }
           }
-        }).timeout(
+        })
+        .timeout(
           const Duration(seconds: 10),
           onTimeout: () {
             if (!mounted) return;

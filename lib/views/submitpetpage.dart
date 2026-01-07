@@ -432,6 +432,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white
+                  ),
                     onPressed: () {
                       submitValidation();
                     },

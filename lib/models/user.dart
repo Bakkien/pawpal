@@ -26,7 +26,7 @@ class User {
     userPassword = json['password'];
     userPhone = json['phone'];
     userWallet = json['wallet'];
-    userRegdate = json['user_regdate'];
+    userRegdate = json['reg_date'];
   }
 
   Map<String, dynamic> toJson() {
@@ -38,7 +38,7 @@ class User {
     data['password'] = userPassword;
     data['phone'] = userPhone;
     data['wallet'] = userWallet;
-    data['user_regdate'] = userRegdate;
+    data['reg_date'] = userRegdate;
     return data;
   }
 }

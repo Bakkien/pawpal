@@ -47,6 +47,7 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
                   child: SizedBox(
@@ -74,11 +75,12 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    // Pet Owner Info
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Poster',
+                          'Pet Owner',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -102,6 +104,7 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                         ),
                       ],
                     ),
+                    // Adopter Info
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -133,6 +136,8 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
+
+                // House Type
                 Text('Type of housing'),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
@@ -156,6 +161,8 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+
+                // Owned pet before
                 Text('Have you owned pets before?'),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
@@ -179,6 +186,8 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+
+                // Reason
                 Text('Why do you want to adopt this pet?'),
                 const SizedBox(height: 10),
                 TextField(
@@ -220,6 +229,7 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
       reasonError = null;
     });
 
+    // reason validation
     if (reason.isEmpty) {
       setState(() {
         reasonError = "Required field";

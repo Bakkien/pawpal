@@ -48,7 +48,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
             children: [
               Expanded(
                 child: listDonations.isEmpty
-                    // show no submission if empty list
+                    // show no donation history if empty list
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -64,7 +64,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
                           ],
                         ),
                       )
-                    // show the list of pets
+                    // show the list of donations
                     : ListView.builder(
                         itemCount: listDonations.length,
                         itemBuilder: (context, index) {
@@ -83,7 +83,9 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                       child: Container(
                                         width: width * 0.22, // more responsive
-                                        height: width * 0.2, // balanced aspect ratio
+                                        height:
+                                            width *
+                                            0.2, // balanced aspect ratio
                                         color: Colors.grey[200],
                                         child: Image.network(
                                           '${MyConfig.server}/pawpal/server/uploads/pet/pet_${listDonations[index].petId}_1.png',
@@ -107,20 +109,25 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // Date
+                                          // Pet Name
                                           Text(
-                                            formatter.format(DateTime.parse(listDonations[index].donationDate.toString())),
+                                            listDonations[index].petName
+                                                .toString(),
                                             style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.grey,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
+                                          const SizedBox(height: 4),
 
-                                          const SizedBox(height: 6),
-
-                                          // Pet name
+                                          // Recipient name or Donor name
                                           Text(
-                                            'Donated to ${listDonations[index].petName}',
+                                            listDonations[index].userId ==
+                                                    widget.user!.userId
+                                                ? 'Recipient: ${listDonations[index].otherUserName}'
+                                                : 'Donor: ${listDonations[index].otherUserName}',
                                             style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
@@ -128,19 +135,56 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
+                                          const SizedBox(height: 4),
+
+                                          // Description
+                                          Text(
+                                            listDonations[index].description
+                                                .toString(),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 4),
+
+                                          // Date
+                                          Text(
+                                            formatter.format(
+                                              DateTime.parse(
+                                                listDonations[index]
+                                                    .donationDate
+                                                    .toString(),
+                                              ),
+                                            ),
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
 
-                                    // Amount
-                                    Text(
-                                      '- RM ${double.tryParse(listDonations[index].amount.toString())?.toStringAsFixed(2) ?? '0.00'}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
-                                      ),
-                                    ),
+                                    // Amount minus or add
+                                    listDonations[index].amount != '0.00'
+                                        ? Text(
+                                            listDonations[index].userId ==
+                                                    widget.user!.userId
+                                                ? '- RM ${double.tryParse(listDonations[index].amount.toString())?.toStringAsFixed(2) ?? '0.00'}'
+                                                : '+ RM ${double.tryParse(listDonations[index].amount.toString())?.toStringAsFixed(2) ?? '0.00'}',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  listDonations[index].userId ==
+                                                      widget.user!.userId
+                                                  ? Colors.red
+                                                  : Colors.green,
+                                            ),
+                                          )
+                                        : SizedBox(), // null
                                   ],
                                 ),
                               ),
@@ -158,6 +202,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
     );
   }
 
+  // load donation history
   void loadDonationHistory() {
     setState(() {
       status = "Loading...";

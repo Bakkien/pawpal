@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pawpal/models/user.dart';
+import 'package:pawpal/myconfig.dart';
 import 'package:pawpal/shared/animated_route.dart';
 import 'package:pawpal/views/adoptionpage.dart';
 import 'package:pawpal/views/donationhistorypage.dart';
@@ -22,17 +23,18 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   late double screenHeight;
-  Uint8List? webImage, savedAvatar;
+  Uint8List? webImage, savedAvatar, networkImage;
   File? image;
   String? name;
   String? email;
+
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserPreferences();
   }
 
-  void _loadUserData() {
+  void _loadUserPreferences() {
     SharedPreferences.getInstance().then((prefs) {
       String? base64image = prefs.getString('avatar');
       name = prefs.getString('name');
@@ -51,16 +53,23 @@ class _MyDrawerState extends State<MyDrawer> {
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
+            // avatar
             currentAccountPicture: CircleAvatar(
               radius: 15,
               backgroundImage: savedAvatar != null
                   ? MemoryImage(savedAvatar!)
-                  : kIsWeb
-                  ? (webImage != null ? MemoryImage(webImage!) : null)
-                  : (image != null ? FileImage(image!) : null),
-              child: (savedAvatar == null && image == null && webImage == null)
+                  : widget.user?.userAvatar != null
+                  ? NetworkImage(
+                      '${MyConfig.server}/pawpal/server/uploads/profile/user_${widget.user!.userId}.png',
+                    )
+                  : null,
+              child: (savedAvatar == null && widget.user?.userAvatar == null)
                   ? Text(
-                      name?.substring(0, 1).toUpperCase() ?? widget.user!.userName.toString().substring(0, 1).toUpperCase() ,
+                      name?.substring(0, 1).toUpperCase() ??
+                          widget.user!.userName
+                              .toString()
+                              .substring(0, 1)
+                              .toUpperCase(),
                       style: const TextStyle(
                         fontSize: 32,
                         color: Colors.white,
@@ -69,10 +78,16 @@ class _MyDrawerState extends State<MyDrawer> {
                     )
                   : null,
             ),
+
+            // user name
             accountName: Text(name ?? widget.user!.userName.toString()),
+
+            //user email
             accountEmail: Text(email ?? widget.user!.userEmail.toString()),
             decoration: BoxDecoration(color: Colors.blue),
           ),
+
+          // Main Screen
           ListTile(
             leading: Icon(Icons.pets),
             title: Text('Pet Adoption & Donation'),
@@ -84,6 +99,8 @@ class _MyDrawerState extends State<MyDrawer> {
               );
             },
           ),
+
+          // Adoption Screen
           ListTile(
             leading: Icon(Icons.request_page),
             title: Text('Adoption'),
@@ -95,6 +112,8 @@ class _MyDrawerState extends State<MyDrawer> {
               );
             },
           ),
+          
+          // Donation History Screen
           ListTile(
             leading: Icon(Icons.history),
             title: Text('Donation History'),
@@ -102,10 +121,14 @@ class _MyDrawerState extends State<MyDrawer> {
               Navigator.pop(context);
               Navigator.pushReplacement(
                 context,
-                AnimatedRoute.slideFromRight(DonationHistoryScreen(user: widget.user)),
+                AnimatedRoute.slideFromRight(
+                  DonationHistoryScreen(user: widget.user),
+                ),
               );
             },
           ),
+
+          // Profile Screen
           ListTile(
             leading: Icon(Icons.person),
             title: Text('Profile'),
@@ -117,6 +140,8 @@ class _MyDrawerState extends State<MyDrawer> {
               );
             },
           ),
+
+          // Login Screen
           ListTile(
             leading: Icon(Icons.logout, color: Colors.red),
             title: Text('Log Out'),
@@ -138,7 +163,7 @@ class _MyDrawerState extends State<MyDrawer> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.end,
               children: const [
-                Text("Version 0.1b", style: TextStyle(color: Colors.grey)),
+                Text("Version 0.3", style: TextStyle(color: Colors.grey)),
               ],
             ),
           ),
@@ -146,15 +171,15 @@ class _MyDrawerState extends State<MyDrawer> {
       ),
     );
   }
-  
-  void removePreferences() async{
+
+  // remove all preferences after log out
+  void removePreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.remove('avatar');
-      prefs.remove('name');
-      prefs.remove('email');
-      prefs.remove('password');
-      prefs.remove('phone');
-      prefs.remove('rememberMe');
-    
+    prefs.remove('avatar');
+    prefs.remove('name');
+    prefs.remove('email');
+    prefs.remove('password');
+    prefs.remove('phone');
+    prefs.remove('rememberMe');
   }
 }

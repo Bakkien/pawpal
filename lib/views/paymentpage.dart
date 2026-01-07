@@ -4,7 +4,7 @@ import 'package:pawpal/myconfig.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PaymentScreen extends StatefulWidget {
-    final User? user;
+  final User? user;
   final double money;
   const PaymentScreen({super.key, required this.user, required this.money});
 
