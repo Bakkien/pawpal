@@ -147,13 +147,15 @@ static const String server = "YOUR_DOMAIN";
 
 7. Update `server/api/payment.dart` and `server/api/payment_update.dart` with your api key, collection id, and xkey. To get these, you are required to get from `https://sso.billplz-sandbox.com/`
 
-```payment.php
+`payment.php`
+```
 // replace with your api key and collection id
 $api_key = 'YOUR_API_KEY';
 $collection_id = 'YOUR_COLLECTION_ID';
 ```
 
-```payment_update.php
+`payment_update.php`
+```
 // replace with your xkey
 $xkey = 'YOUR_X_KEY';
 ```
