@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 07, 2026 at 11:47 AM
+-- Generation Time: Jan 08, 2026 at 07:32 PM
 -- Server version: 10.3.39-MariaDB-log-cll-lve
 -- PHP Version: 8.1.34
 
@@ -38,6 +38,14 @@ CREATE TABLE `tbl_adoptions` (
   `requested_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+--
+-- Dumping data for table `tbl_adoptions`
+--
+
+INSERT INTO `tbl_adoptions` (`adoption_id`, `pet_id`, `user_id`, `house_type`, `owned`, `reason`, `status`, `requested_date`) VALUES
+(1, 5, 3, 'Landed House', 'Yes', 'I very like those kittens!', 'Approve', '2026-01-07 18:53:59'),
+(5, 21, 3, 'Condo', 'No', 'I like this cat', 'Reject', '2026-01-08 15:51:17');
+
 -- --------------------------------------------------------
 
 --
@@ -59,10 +67,16 @@ CREATE TABLE `tbl_donations` (
 --
 
 INSERT INTO `tbl_donations` (`donation_id`, `pet_id`, `user_id`, `donation_type`, `amount`, `description`, `donation_date`) VALUES
-(1, 2, 3, 'Money', 5.00, 'Cash Donation', '2026-01-04 20:54:36'),
-(2, 2, 3, 'Money', 5.00, 'Cash Donation', '2026-01-04 21:00:47'),
-(3, 2, 3, 'Money', 10.50, 'Cash Donation', '2026-01-05 08:44:31'),
-(4, 2, 3, 'Medical', 0.00, '2 pack of pain bills', '2026-01-06 13:15:27');
+(1, 22, 3, 'Money', 5.00, 'Cash Donation', '2026-01-04 20:54:36'),
+(2, 22, 3, 'Money', 5.00, 'Cash Donation', '2026-01-04 21:00:47'),
+(3, 22, 3, 'Money', 10.50, 'Cash Donation', '2026-01-05 08:44:31'),
+(4, 22, 3, 'Medical', 0.00, '2 pack of pain bills', '2026-01-06 13:15:27'),
+(5, 22, 3, 'Money', 10.00, 'Cash Donation', '2026-01-07 19:00:55'),
+(6, 22, 3, 'Money', 10.00, 'Cash Donation', '2026-01-08 14:58:21'),
+(7, 22, 3, 'Money', 10.00, 'Cash Donation', '2026-01-08 15:26:35'),
+(8, 22, 3, 'Money', 10.00, 'Cash Donation', '2026-01-08 15:53:55'),
+(9, 24, 1, 'Money', 50.00, 'Cash Donation', '2026-01-08 19:07:36'),
+(10, 24, 2, 'Money', 20.00, 'Cash Donation', '2026-01-08 19:08:22');
 
 -- --------------------------------------------------------
 
@@ -92,10 +106,12 @@ CREATE TABLE `tbl_pets` (
 --
 
 INSERT INTO `tbl_pets` (`pet_id`, `user_id`, `pet_name`, `pet_type`, `gender`, `age`, `category`, `health`, `description`, `image_paths`, `lat`, `lng`, `created_at`, `is_adopted`) VALUES
-(2, 1, 'Doggie', 'Dog', 'Male', '2 years old', 'Donation Request', 'Critical', 'He is injured, please help me!', '[\"image1: ../uploads/pet/pet_2_1.png\"]', '6.4591117', '100.5022967', '2025-12-05 21:44:19', 0),
-(4, 1, 'Little White', 'Rabbit', 'Female', '1 years old', 'Help/Rescue', 'Healthy', 'Help me, my rabbit is run away from my house.', '[\"image1: ../uploads/pet/pet_4_1.png\"]', '6.4606617', '100.5019317', '2025-12-06 09:00:25', 0),
-(5, 1, 'Kitties', 'Cat', 'Both', '2 months', 'Adoption', 'Healthy', 'There got 4 cute kitties come adopt them.', '[\"image1: ../uploads/pet/pet_5_1.png\"]', '6.4606617', '100.5019317', '2026-01-02 11:30:46', 0),
-(6, 2, 'Snoky', 'Cat', 'Male', '3 months', 'Adoption', 'Healthy', 'He is hiding under the train rail.', '[\"image1: ../uploads/pet/pet_6_1.png\"]', '6.4606617', '100.5019317', '2026-01-02 11:32:27', 0);
+(4, 1, 'Little White', 'Rabbit', 'Female', '1 years old', 'Help/Rescue', 'Healthy', 'Help me, my rabbit is run away from my house', '[\"image1: ../uploads/pet/pet_4_1.png\"]', '6.4606617', '100.5019317', '2025-12-06 09:00:25', 0),
+(5, 1, 'Kitties', 'Cat', 'Both', '2 months', 'Adoption', 'Healthy', 'There got 4 cute kitties come adopt them.', '[\"image1: ../uploads/pet/pet_5_1.png\"]', '6.4606617', '100.5019317', '2026-01-02 11:30:46', 1),
+(6, 2, 'Snoky', 'Dog', 'Male', '3 months', 'Adoption', 'Healthy', 'He is hiding under the train rail.', '[\"image1: ../uploads/pet/pet_6_1.png\"]', '6.4606617', '100.5019317', '2026-01-02 11:32:27', 0),
+(21, 1, 'Mao Mao', 'Cat', 'Female', '4 months', 'Adoption', 'Healthy', 'Need someone to adopt it.', '[\"image1: ../uploads/pet/pet_21_1.png\"]', '6.4606617', '100.5019317', '2026-01-08 14:49:12', 0),
+(22, 1, 'Doggie', 'Dog', 'Male', '2 years old', 'Donation Request', 'Critical', 'He is injured, please help me!', '[\"image1: ../uploads/pet/pet_22_1.png\"]', '6.4606617', '100.5019317', '2026-01-08 16:09:25', 0),
+(24, 3, 'Oran', 'Cat', 'Male', '1 months', 'Donation Request', 'Critical', 'Help me, I do not have enough money to pay the bill.', '[\"image1: ../uploads/pet/pet_24_1.png\"]', '6.4606617', '100.5019317', '2026-01-08 19:04:08', 0);
 
 -- --------------------------------------------------------
 
@@ -119,9 +135,9 @@ CREATE TABLE `tbl_users` (
 --
 
 INSERT INTO `tbl_users` (`user_id`, `avatar`, `name`, `email`, `password`, `phone`, `wallet`, `reg_date`) VALUES
-(1, '../uploads/profile/user_1.png', 'Tan Yee Kien', 'yeekientan@gmail.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0123456789', 30.50, '2025-11-24 12:48:24'),
-(2, NULL, 'Bakkien', 'bakkien@gmail.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0123456789', 0.00, '2025-11-24 12:54:17'),
-(3, NULL, 'jackshen', 'jackshen@gmail.com', '2891baceeef1652ee698294da0e71ba78a2a4064', '0123456789', 129.50, '2026-01-02 14:19:25');
+(1, '../uploads/profile/user_1.png', 'Tan Yee Kien', 'yeekientan@gmail.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0123456789', 60.50, '2025-11-24 12:48:24'),
+(2, NULL, 'Bakkien', 'bakkien@gmail.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', '0123456789', 10.00, '2025-11-24 12:54:17'),
+(3, '../uploads/profile/user_3.png', 'jackshen', 'jackshen@gmail.com', '2891baceeef1652ee698294da0e71ba78a2a4064', '0136547892', 179.50, '2026-01-02 14:19:25');
 
 --
 -- Indexes for dumped tables
@@ -160,19 +176,19 @@ ALTER TABLE `tbl_users`
 -- AUTO_INCREMENT for table `tbl_adoptions`
 --
 ALTER TABLE `tbl_adoptions`
-  MODIFY `adoption_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `adoption_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbl_donations`
 --
 ALTER TABLE `tbl_donations`
-  MODIFY `donation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `donation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tbl_pets`
 --
 ALTER TABLE `tbl_pets`
-  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID', AUTO_INCREMENT=21;
+  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID', AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `tbl_users`

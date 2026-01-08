@@ -660,7 +660,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                
                 submitPet(
                   petName,
                   petType,
@@ -673,6 +673,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   lng.toString(),
                   base64images,
                 );
+                Navigator.of(context).pop();
               },
               child: Text('Submit'),
             ),
