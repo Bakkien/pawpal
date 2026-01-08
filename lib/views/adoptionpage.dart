@@ -478,6 +478,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
               if (!mounted) return;
               stopLoading();
               Navigator.of(context).pop();
+              loadAdoptions(widget.user!.userId.toString());
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("${resarray['message']}"),

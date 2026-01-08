@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:http/http.dart' as http;
+import 'package:pawpal/views/mainpage.dart';
 
 class SubmitPetScreen extends StatefulWidget {
   final User? user;
@@ -659,6 +660,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
                 submitPet(
                   petName,
                   petType,
@@ -671,7 +673,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                   lng.toString(),
                   base64images,
                 );
-                Navigator.of(context).pop();
               },
               child: Text('Submit'),
             ),
@@ -743,7 +744,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             if (resarray['success']) {
               if (!mounted) return;
               stopLoading();
-              Navigator.pop(context);// cant pushreplacement idk why
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(user: widget.user)));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("${resarray['message']}"),

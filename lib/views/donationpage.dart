@@ -295,7 +295,7 @@ class _DonationScreenState extends State<DonationScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          content: const Text('Are you sure you want to submit?'),
+          content: const Text('Are you sure you want to donate?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -306,15 +306,16 @@ class _DonationScreenState extends State<DonationScreen> {
             TextButton(
               onPressed: () {
                 if (donationType == 'Money') {
+                  Navigator.of(context).pop();
                   submitDonate(
                     donationType,
                     amount.toStringAsFixed(2),
                     description,
                   );
                 } else {
+                  Navigator.of(context).pop();
                   submitDonate(donationType, '0.00', description);
                 }
-                Navigator.of(context).pop();
               },
               child: Text('Sure'),
             ),

@@ -431,7 +431,7 @@ class _MainScreenState extends State<MainScreen> {
                                       foregroundColor: Colors.white,
                                     ),
                                     onPressed: () {
-                                      if (!mounted) return;
+                                      Navigator.pop(context);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -452,6 +452,7 @@ class _MainScreenState extends State<MainScreen> {
                                       foregroundColor: Colors.white,
                                     ),
                                     onPressed: () {
+                                      Navigator.pop(context);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -471,6 +472,7 @@ class _MainScreenState extends State<MainScreen> {
                             children: [
                               IconButton(
                                 onPressed: () {
+                                  Navigator.pop(context);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

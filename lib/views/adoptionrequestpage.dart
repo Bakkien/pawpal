@@ -256,6 +256,7 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                Navigator.pop(context);
                 submitRequest(
                   petId,
                   userId,
@@ -333,8 +334,6 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                   backgroundColor: Colors.green,
                 ),
               );
-              if (!mounted) return;
-              stopLoading();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

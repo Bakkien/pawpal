@@ -467,6 +467,10 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white
+                  ),
                     onPressed: () {
                       submitValidation();
                     },
@@ -778,6 +782,7 @@ class _UpdatePetScreenState extends State<UpdatePetScreen> {
             if (resarray['success']) {
               if (!mounted) return;
               stopLoading();
+              Navigator.pop(context);
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
