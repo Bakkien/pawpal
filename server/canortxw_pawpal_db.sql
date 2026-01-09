@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 08, 2026 at 07:32 PM
+-- Generation Time: Jan 09, 2026 at 10:56 AM
 -- Server version: 10.3.39-MariaDB-log-cll-lve
 -- PHP Version: 8.1.34
 
@@ -147,13 +147,17 @@ INSERT INTO `tbl_users` (`user_id`, `avatar`, `name`, `email`, `password`, `phon
 -- Indexes for table `tbl_adoptions`
 --
 ALTER TABLE `tbl_adoptions`
-  ADD PRIMARY KEY (`adoption_id`);
+  ADD PRIMARY KEY (`adoption_id`),
+  ADD KEY `fk_adoptions_pet` (`pet_id`),
+  ADD KEY `fk_user_pet` (`user_id`);
 
 --
 -- Indexes for table `tbl_donations`
 --
 ALTER TABLE `tbl_donations`
-  ADD PRIMARY KEY (`donation_id`);
+  ADD PRIMARY KEY (`donation_id`),
+  ADD KEY `fk_donations_user` (`user_id`),
+  ADD KEY `fk_donations_pet` (`pet_id`);
 
 --
 -- Indexes for table `tbl_pets`
@@ -199,6 +203,20 @@ ALTER TABLE `tbl_users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `tbl_adoptions`
+--
+ALTER TABLE `tbl_adoptions`
+  ADD CONSTRAINT `fk_adoptions_pet` FOREIGN KEY (`pet_id`) REFERENCES `tbl_pets` (`pet_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_pet` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_donations`
+--
+ALTER TABLE `tbl_donations`
+  ADD CONSTRAINT `fk_donations_pet` FOREIGN KEY (`pet_id`) REFERENCES `tbl_pets` (`pet_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_donations_user` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tbl_pets`
